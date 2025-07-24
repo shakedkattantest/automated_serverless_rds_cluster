@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless stack for provisioning RDS (Postgres/MySQL) clusters
+
+Resources:
+
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: RDSRequestAPI
+      StageName: prod
+
+  SNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: RDSProvisioningTopic
+
+  SQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: RDSProvisioningQueue
+
+  SQSSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Protocol: sqs
+      Endpoint: !GetAtt SQSQueue.Arn
+      TopicArn: !Ref SNSTopic
+      RawMessageDelivery: true
+
+  QueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref SQSQueue
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: "sqs:SendMessage"
+            Resource: !GetAtt SQSQueue.Arn
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Ref SNSTopic
+
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: RDSProvisionerFunction
+      Handler: handler.lambda_handler
+      Runtime: python3.12
+      CodeUri: src/
+      Events:
+        SQSTrigger:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt SQSQueue.Arn
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - SQSPollerPolicy:
+            QueueName: !Ref SQSQueue
+      Environment:
+        Variables:
+          SQS_QUEUE_URL: !Ref SQSQueue
+          SNS_TOPIC_ARN: !Ref SNSTopic
