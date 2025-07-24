@@ -1,69 +1,51 @@
-# .circleci/config.yml
-
 version: 2.1
 
 orbs:
-  aws-cli: circleci/aws-cli@4.0
   sam: circleci/aws-sam@4.0
   terraform: circleci/terraform@3.2.1
 
 jobs:
-  install-dependencies:
-    docker:
-      - image: cimg/python:3.11
-    steps:
-      - checkout
-      - run:
-          name: Install AWS CLI and Terraform
-          command: |
-            sudo pip install awscli boto3
-            curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor > hashicorp.gpg
-            sudo install -o root -g root -m 644 hashicorp.gpg /usr/share/keyrings/
-            sudo apt update && sudo apt install terraform -y
-
   deploy-serverless:
-    docker:
-      - image: cimg/python:3.11
+    executor: sam/default
     steps:
       - checkout
-      - sam/install
       - run:
           name: Deploy Serverless Stack with SAM
           command: |
-            sam build
-            sam deploy --stack-name rds-automation-stack \
-                       --capabilities CAPABILITY_IAM \
-                       --region $AWS_REGION \
-                       --parameter-overrides \
-                         Env=$ENVIRONMENT \
-                       --no-confirm-changeset \
-                       --no-fail-on-empty-changeset
+            STACK_NAME="rds-automation-stack"
+            if aws cloudformation describe-stacks --stack-name "$STACK_NAME" &> /dev/null; then
+              echo "✅ Stack already exists. Skipping SAM deployment."
+              exit 0
+            else
+              echo "🚀 Stack not found. Deploying with SAM..."
+              sam build
+              sam deploy --stack-name rds-automation-stack \
+                         --capabilities CAPABILITY_IAM \
+                         --region $AWS_REGION \
+                         --no-confirm-changeset \
+                         --no-fail-on-empty-changeset
+            fi
 
   apply-terraform:
-    docker:
-      - image: hashicorp/terraform:light
+    executor:
+      name: terraform/default
     steps:
       - checkout
-      - run:
-          name: Terraform Init
-          command: terraform init
-      - run:
-          name: Terraform Validate
-          command: terraform validate
-      - run:
-          name: Terraform Plan
-          command: terraform plan -out=tfplan
-      - run:
-          name: Terraform Apply
-          command: terraform apply -auto-approve tfplan
+      - terraform/init:
+          path: terraform/env/$ENVIRONMENT/rds
+      - terraform/validate:
+          path: terraform/env/$ENVIRONMENT/rds
+      - terraform/plan:
+          path: terraform/env/$ENVIRONMENT/rds
+          out: tfplan
+      - terraform/apply:
+          path: terraform/env/$ENVIRONMENT/rds
+          plan: tfplan
 
 workflows:
   deploy-and-provision:
     jobs:
-      - install-dependencies
       - deploy-serverless:
-          requires:
-            - install-dependencies
           filters:
             branches:
               only: main
