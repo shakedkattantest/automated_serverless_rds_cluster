@@ -4,12 +4,6 @@ Description: Serverless stack for provisioning RDS (Postgres/MySQL) clusters
 
 Resources:
 
-  ApiGateway:
-    Type: AWS::Serverless::Api
-    Properties:
-      Name: RDSRequestAPI
-      StageName: prod
-
   SNSTopic:
     Type: AWS::SNS::Topic
     Properties:
@@ -64,3 +58,53 @@ Resources:
         Variables:
           SQS_QUEUE_URL: !Ref SQSQueue
           SNS_TOPIC_ARN: !Ref SNSTopic
+
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: RDSRequestAPI
+      StageName: prod
+      DefinitionBody:
+        swagger: "2.0"
+        info:
+          title: "RDSRequestAPI"
+          version: "1.0"
+        paths:
+          /request:
+            post:
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:sns:action/Publish
+                credentials:
+                  Fn::GetAtt: ApiGatewayToSNSRole.Arn
+                requestTemplates:
+                  application/json: |
+                    {
+                      "TopicArn": "$util.escapeJavaScript('${SNSTopic}')",
+                      "Message": "$input.body"
+                    }
+                responses:
+                  default:
+                    statusCode: "200"
+
+  ApiGatewayToSNSRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ApiGatewayToSNSRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ApiGatewaySNSPublish
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: sns:Publish
+                Resource: !Ref SNSTopic
