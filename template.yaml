@@ -88,7 +88,7 @@ Resources:
                 requestTemplates:
                   application/json: |
                    {
-                    "TopicArn": "arn:aws:sns:eu-central-1:<account-id>:RDSProvisioningTopic",
+                    "TopicArn": "arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic",
                     "Message": "$util.escapeJavaScript($input.body)"
                    }
                 responses:
