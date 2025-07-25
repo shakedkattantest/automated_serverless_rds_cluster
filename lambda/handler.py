@@ -10,7 +10,7 @@ logger.setLevel(logging.INFO)
 
 # ENV Vars
 GITHUB_TOKEN = "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"
-GITHUB_REPO = "github.com/shakedkattan/automated_serverless_rds_cluster"
+GITHUB_REPO = "shakedkattan/automated_serverless_rds_cluster"
 BRANCH_BASE = "main"
 
 # GitHub Client
