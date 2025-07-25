@@ -54,10 +54,16 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - SQSPollerPolicy:
             QueueName: !Ref SQSQueue
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: secretsmanager:GetSecretValue
+              Resource: "*"
       Environment:
         Variables:
           SQS_QUEUE_URL: !Ref SQSQueue
           SNS_TOPIC_ARN: !Ref SNSTopic
+          GITHUB_TOKEN: !Sub '{{resolve:secretsmanager:github}}'
 
   ApiGateway:
     Type: AWS::Serverless::Api
