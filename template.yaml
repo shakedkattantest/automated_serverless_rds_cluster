@@ -88,9 +88,9 @@ Resources:
                 requestTemplates:
                   application/json: |
                    {
-                    "TopicArn": "arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic",
-                    "Message": "$util.escapeJavaScript($input.body.trim())"
-                   }
+                      "TopicArn": "arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic",
+                      "Message": "$util.escapeJavaScript($input.body.trim()).replaceAll(\"\\'\", \"'\")"
+                    }
                 responses:
                   default:
                     statusCode: "200"
