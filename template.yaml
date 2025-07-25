@@ -85,6 +85,12 @@ Resources:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:sns:action/Publish
                 credentials:
                   Fn::GetAtt: ApiGatewayToSNSRole.Arn
+                requestTemplates:
+                  application/json: |
+                   {
+                    "TopicArn": "arn:aws:sns:eu-central-1:<account-id>:RDSProvisioningTopic",
+                    "Message": "$util.escapeJavaScript($input.body)"
+                   }
                 responses:
                   default:
                     statusCode: "200"
