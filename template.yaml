@@ -63,7 +63,7 @@ Resources:
         Variables:
           SQS_QUEUE_URL: !Ref SQSQueue
           SNS_TOPIC_ARN: !Ref SNSTopic
-          GITHUB_TOKEN: !Sub '{{resolve:secretsmanager:github}}'
+          GITHUB_TOKEN: !Sub '{{resolve:secretsmanager:github2}}'
 
   ApiGateway:
     Type: AWS::Serverless::Api
