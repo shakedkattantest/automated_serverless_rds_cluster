@@ -89,7 +89,7 @@ Resources:
                   application/json: |
                    {
                     "TopicArn": "arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic",
-                    "Message": "$util.escapeJavaScript($input.body)"
+                    "Message": "$util.escapeJavaScript($input.body.trim())"
                    }
                 responses:
                   default:
