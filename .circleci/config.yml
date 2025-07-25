@@ -17,8 +17,8 @@ jobs:
           name: Deploy Serverless Stack with SAM
           command: |
             STACK_NAME="rds-automation-stack"
-            #if aws cloudformation describe-stacks --stack-name "$STACK_NAME" &> /dev/null; then
-              #echo "✅ Stack already exists. Skipping SAM deployment."
+            if aws cloudformation describe-stacks --stack-name "$STACK_NAME" &> /dev/null; then
+              echo "✅ Stack already exists. Skipping SAM deployment."
               #exit 0
             #else
               #echo "🚀 Stack not found. Deploying with SAM..."
@@ -30,7 +30,7 @@ jobs:
                          --resolve-s3 \
                          --no-confirm-changeset \
                          --no-fail-on-empty-changeset
-            fi
+            #fi
 
   apply-terraform:
     executor:
