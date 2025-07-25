@@ -87,9 +87,10 @@ Resources:
                   Fn::GetAtt: ApiGatewayToSNSRole.Arn
                 requestTemplates:
                   application/json: |
-                   {
+                    #set($inputRoot = $input.path('$'))
+                    {
                       "TopicArn": "arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic",
-                      "Message": "$util.escapeJavaScript($input.body.trim()).replaceAll(\"\\'\", \"'\")"
+                      "Message": "$util.escapeJavaScript($input.json('$')).replaceAll("\\'","'")"
                     }
                 responses:
                   default:
