@@ -37,16 +37,14 @@ jobs:
       name: terraform/default
     steps:
       - checkout
-      - terraform/init:
-          path: terraform/env/$ENVIRONMENT/rds
-      - terraform/validate:
-          path: terraform/env/$ENVIRONMENT/rds
-      - terraform/plan:
-          path: terraform/env/$ENVIRONMENT/rds
-          out: tfplan
-      - terraform/apply:
-          path: terraform/env/$ENVIRONMENT/rds
-          plan: tfplan
+      - run:
+          name: Terraform Apply to Merged Path
+          command: |
+            TARGET_PATH=$(dirname $(git show --name-only --pretty="" | grep '^terraform/env/' | head -n1))
+            terraform init -input=false $TARGET_PATH
+            terraform validate $TARGET_PATH
+            terraform plan -input=false -out=tfplan $TARGET_PATH
+            terraform apply -input=false -auto-approve tfplan
 
 workflows:
   deploy-and-provision:
