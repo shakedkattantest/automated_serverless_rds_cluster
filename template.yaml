@@ -87,11 +87,7 @@ Resources:
                   Fn::GetAtt: ApiGatewayToSNSRole.Arn
                 requestTemplates:
                   application/json: |
-                    #set($inputRoot = $input.path('$'))
-                    {
-                      "TopicArn": "arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic",
-                      "Message": "$util.escapeJavaScript($input.json('$')).replaceAll("\\'","'")"
-                    }
+                    Action=Publish&TopicArn=$util.urlEncode('arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic')&Message=$util.urlEncode($input.body)
                 responses:
                   default:
                     statusCode: "200"
