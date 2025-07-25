@@ -68,7 +68,7 @@ Resources:
   ApiGateway:
     Type: AWS::Serverless::Api
     Properties:
-      Name: RDSRequestAPI
+      Name: RDSQueryParamAPI
       StageName: prod
       DefinitionBody:
         swagger: "2.0"
@@ -78,6 +78,18 @@ Resources:
         paths:
           /request:
             post:
+              parameters:
+                - name: TopicArn
+                  in: query
+                  required: true
+                  type: string
+                - name: Message
+                  in: query
+                  required: true
+                  type: string
+              responses:
+                "200":
+                  description: "SNS publish success"
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -85,9 +97,12 @@ Resources:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:sns:action/Publish
                 credentials:
                   Fn::GetAtt: ApiGatewayToSNSRole.Arn
+                requestParameters:
+                  integration.request.querystring.TopicArn: method.request.querystring.TopicArn
+                  integration.request.querystring.Message: method.request.querystring.Message
                 requestTemplates:
-                  application/json: |
-                    Action=Publish&TopicArn=$util.urlEncode('arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic')&Message=$util.urlEncode($input.body)
+                  application/json: "Action=Publish"
+                passthroughBehavior: when_no_templates
                 responses:
                   default:
                     statusCode: "200"
