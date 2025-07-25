@@ -9,9 +9,9 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 # ENV Vars
-GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
-GITHUB_REPO = os.environ["GITHUB_REPO"]
-BRANCH_BASE = os.environ.get("BRANCH_BASE", "main")
+GITHUB_TOKEN = "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"
+GITHUB_REPO = "github.com/shakedkattan/automated_serverless_rds_cluster"
+BRANCH_BASE = "main"
 
 # GitHub Client
 gh = Github(GITHUB_TOKEN)
