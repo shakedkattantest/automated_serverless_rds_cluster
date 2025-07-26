@@ -47,9 +47,9 @@ variable "password" {
 }
 
 
-variable "subnet_ids" {
-  description = "List of private subnet IDs for RDS subnet group"
-  type        = list(string)
+variable "db_subnet_group_name" {
+  description = "Name of the DB subnet group to associate with the RDS instance"
+  type        = string
 }
 
 
