@@ -93,8 +93,8 @@ Resources:
                 credentials:
                   Fn::GetAtt: ApiGatewayToSNSRole.Arn
                 requestParameters:
-                  integration.request.querystring.Action: "'Publish'"
                   integration.request.querystring.TopicArn: "'arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic'"
+                  integration.request.querystring.Message: "method.request.body"
                 responses:
                   default:
                     statusCode: "200"
