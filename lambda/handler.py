@@ -19,23 +19,20 @@ gh = Github(GITHUB_TOKEN)
 repo = gh.get_repo(GITHUB_REPO)
 
 def append_to_list_in_hcl(hcl_text, list_name, new_value):
-    pattern = rf'({list_name}\s*=\s*\[)([^\]]*)\]'
+    pattern = rf'({list_name}\s*=\s*\[)([^\]]*)(\])'
     match = re.search(pattern, hcl_text)
     if not match:
         raise ValueError(f"List '{list_name}' not found in HCL")
 
-    prefix = match.group(1)
     existing_items_str = match.group(2).strip()
-
     items = [item.strip().strip('"') for item in existing_items_str.split(',') if item.strip()]
 
     if new_value in items:
         return hcl_text
 
     items.append(new_value)
-
-    new_items_str = ''.join(f'"{item}", ' for item in items)
-    new_list_str = f'{prefix}{new_items_str}]'
+    new_items_str = ', '.join(f'"{item}"' for item in items)
+    new_list_str = f'{match.group(1)}{new_items_str}{match.group(3)}'
 
     return hcl_text[:match.start()] + new_list_str + hcl_text[match.end():]
 
