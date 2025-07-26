@@ -39,14 +39,13 @@ jobs:
       - checkout
       - run:
           name: Terraform Apply to Merged Path
-          command: |
-            TARGET_PATH=$(git show --name-only --pretty="" | grep '^terraform/env/' | head -n1 | sed -E 's|(terraform/env/[^/]+).*|\1|')
-            terraform init -input=false $TARGET_PATH
-            terraform validate $TARGET_PATH
-            terraform plan -input=false -out=tfplan $TARGET_PATH
-            terraform apply -input=false -auto-approve tfplan
-            echo "📁 TARGET_PATH detected: $TARGET_PATH"
-
+           command: |
+            echo "🟢 STEP IS RUNNING"
+            git fetch --unshallow || true
+            echo "🔍 git show:"
+            git show --name-only --pretty=
+            echo "📁 Try extract TARGET_PATH:"
+            git show --name-only --pretty="" | grep '^terraform/env/' | head -n1 | sed -E 's|(terraform/env/[^/]+).*|\1|'
 workflows:
   deploy-and-provision:
     jobs:
