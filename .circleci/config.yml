@@ -17,10 +17,10 @@ jobs:
           name: Deploy Serverless Stack with SAM
           command: |
             STACK_NAME="rds-automation-stack"
-            #if aws cloudformation describe-stacks --stack-name "$STACK_NAME" &> /dev/null; then
-              #echo "✅ Stack already exists. Skipping SAM deployment."
-              #exit 0
-            #else
+            if aws cloudformation describe-stacks --stack-name "$STACK_NAME" &> /dev/null; then
+              echo "✅ Stack already exists. Skipping SAM deployment."
+              exit 0
+            else
               #echo "🚀 Stack not found. Deploying with SAM..."
               sam build
               sam deploy --stack-name rds-automation-stack \
@@ -30,7 +30,7 @@ jobs:
                          --resolve-s3 \
                          --no-confirm-changeset \
                          --no-fail-on-empty-changeset
-            #fi
+            fi
 
   apply-terraform:
     executor:
@@ -45,6 +45,7 @@ jobs:
             terraform validate $TARGET_PATH
             terraform plan -input=false -out=tfplan $TARGET_PATH
             terraform apply -input=false -auto-approve tfplan
+            echo "📁 TARGET_PATH detected: $TARGET_PATH"
 
 workflows:
   deploy-and-provision:
