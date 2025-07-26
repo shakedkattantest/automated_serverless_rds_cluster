@@ -43,10 +43,22 @@ jobs:
             git fetch origin main --depth=100 || true
 
             echo "🔁 Recent commits:"
-            git log --oneline -n 5
+            git log --oneline -n 3 || true
 
-            echo "🔍 Changed files from previous commit:"
-            git diff --name-only HEAD^ HEAD || true
+            echo "🔍 Detecting changed env:"
+            TARGET_PATH=$(git diff --name-only HEAD^ HEAD | grep '^terraform/env/' | head -n1 | sed -E 's|(terraform/env/[^/]+).*|\1|')
+
+            if [ -z "$TARGET_PATH" ]; then
+              echo "❌ No env path found. Skipping Terraform apply."
+              exit 0
+            fi
+
+            echo "📁 TARGET_PATH=$TARGET_PATH"
+
+            cd "$TARGET_PATH"
+            terraform init -input=false
+            terraform plan -input=false
+            terraform apply
             
 workflows:
   deploy-and-provision:
