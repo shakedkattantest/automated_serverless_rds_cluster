@@ -39,7 +39,7 @@ jobs:
       - checkout
       - run:
           name: Terraform Apply to Merged Path
-           command: |
+          command: |
             echo "🟢 STEP IS RUNNING"
             git fetch --unshallow || true
             echo "🔍 git show:"
