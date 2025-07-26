@@ -65,39 +65,39 @@ Resources:
           SNS_TOPIC_ARN: !Ref SNSTopic
           GITHUB_TOKEN: !Sub '{{resolve:secretsmanager:github-access-token:SecretString:token}}'
 
-ApiGateway:
-  Type: AWS::Serverless::Api
-  Properties:
-    Name: RDSRequestAPI
-    StageName: prod
-    DefinitionBody:
-      swagger: "2.0"
-      info:
-        title: "RDSRequestAPI"
-        version: "1.0"
-      paths:
-        /request:
-          post:
-            consumes:
-              - application/json
-            produces:
-              - application/json
-            responses: {}
-            x-amazon-apigateway-integration:
-              type: aws
-              httpMethod: POST
-              uri:
-                Fn::Sub: arn:aws:apigateway:${AWS::Region}:sns:action/Publish
-              credentials:
-                Fn::GetAtt: ApiGatewayToSNSRole.Arn
-              requestTemplates:
-                application/json: |
-                  Action=Publish
-                  &TopicArn=arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic
-                  &Message=$util.urlEncode($input.body)
-              responses:
-                default:
-                  statusCode: "200"
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: RDSRequestAPI
+      StageName: prod
+      DefinitionBody:
+        swagger: "2.0"
+        info:
+          title: "RDSRequestAPI"
+          version: "1.0"
+        paths:
+          /request:
+            post:
+              consumes:
+                - application/json
+              produces:
+                - application/json
+              responses: {}
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:sns:action/Publish
+                credentials:
+                  Fn::GetAtt: ApiGatewayToSNSRole.Arn
+                requestTemplates:
+                  application/json: |
+                    Action=Publish
+                    &TopicArn=arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic
+                    &Message=$util.urlEncode($input.body)
+                responses:
+                  default:
+                    statusCode: "200"
 
   ApiGatewayToSNSRole:
     Type: AWS::IAM::Role
