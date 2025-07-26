@@ -16,7 +16,6 @@ locals {
     db_subnet_group_name = aws_db_subnet_group.rds.name
     security_group_ids   = [aws_security_group.rds.id]
     allocated_storage    = 20
-    skip_final_snapshot  = true
   }
 
   rds_customs = {
@@ -54,5 +53,4 @@ module "rds_instances" {
   db_subnet_group_name = each.value.db_subnet_group_name
   security_group_ids   = each.value.security_group_ids
   allocated_storage    = each.value.allocated_storage
-  skip_final_snapshot  = each.value.skip_final_snapshot
 }
