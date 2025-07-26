@@ -37,7 +37,7 @@ def lambda_handler(event, context):
         repo.create_git_ref(ref=f"refs/heads/{branch_name}", sha=base.commit.sha)
 
         # Add a dummy comment
-        file = repo.get_contents(tf_path, ref=branch_name)
+        file = repo.get_contents(tf_path, ref=BRANCH_BASE)
         existing = file.decoded_content.decode()
         new_content = existing + f"\n\n# Triggered PR for {db_name}"
 
