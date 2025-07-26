@@ -40,10 +40,13 @@ jobs:
       - run:
           name: Terraform Apply to Merged Path
           command: |
-            git fetch origin main --depth=2 || true
+            git fetch origin main --depth=100 || true
 
-            echo "📄 git diff --name-only origin/main...HEAD:"
-            git diff --name-only origin/main...HEAD || true
+            echo "🔁 Recent commits:"
+            git log --oneline -n 5
+
+            echo "🔍 Changed files from previous commit:"
+            git diff --name-only HEAD^ HEAD || true
             
 workflows:
   deploy-and-provision:
