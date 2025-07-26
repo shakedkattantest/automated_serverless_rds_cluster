@@ -1,6 +1,6 @@
 locals {
-  mysql_list    = ["mashu-db", "tov-db", "kore-db"]
-  postgres_list = ["user-db", "payments-db", "analytics-db"]
+  mysql_list    = ["mashu", "tov", "kore"]
+  postgres_list = ["user", "payments", "analytics"]
 
   # Map DB name
   engine_map = merge(
@@ -23,7 +23,7 @@ locals {
       instance_class = "db.t3.small"
     },
     "analytics-db" = {
-      allocated_storage = 100
+      allocated_storage = 21
     }
   }
 
