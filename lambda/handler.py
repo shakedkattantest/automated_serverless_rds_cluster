@@ -21,13 +21,15 @@ def lambda_handler(event, context):
     logger.info("Incoming event: %s", json.dumps(event))
 
     try:
-        message = event["Records"][0]["body"]
-        payload = json.loads(message)
-        db_name = payload["db_name"]
-        env = payload["env"]
+        raw_body = json.loads(event["Records"][0]["body"])  # SQS body
+        sns_message = json.loads(raw_body["Message"])       # SNS message payload
+        db_name = sns_message["db_name"]
+        engine = sns_message["engine"]
+        env = sns_message["env"]
     except (KeyError, json.JSONDecodeError) as e:
-        logger.error("\u274c Bad payload: %s", str(e))
-        return {"statusCode": 400, "body": "Invalid request"}
+        logger.error("❌ Bad payload: %s", str(e))
+    return {"statusCode": 400, "body": "Invalid request"}
+
 
     branch_name = f"test-rds-pr-{db_name}-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
     tf_path = f"terraform/env/{env}/rds/locals.tf"
