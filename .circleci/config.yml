@@ -48,8 +48,6 @@ workflows:
   deploy-and-provision:
     jobs:
       - apply-terraform:
-          requires:
-            - deploy-serverless
           filters:
             branches:
               only: main
