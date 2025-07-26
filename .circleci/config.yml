@@ -41,7 +41,7 @@ jobs:
           name: Terraform Apply to Merged Path
           command: |
             echo "🟢 STEP IS RUNNING"
-            git fetch origin main --unshallow
+            git fetch origin main
             echo "🔍 git show:"
             git show --name-only --pretty=
             echo "📁 Try extract TARGET_PATH:"
