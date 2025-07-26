@@ -1,8 +1,16 @@
 locals {
-  rds_list = ["user-db", "payments-db", "analytics-db"]
+  mysql_list    = ["mashu-db", "tov-db", "kore-db"]
+  postgres_list = ["user-db", "payments-db", "analytics-db"]
 
-  default_settings = {
-    engine               = "postgres"
+  # Map DB name
+  engine_map = merge(
+    { for name in local.mysql_list    : name => { engine = "mysql" } },
+    { for name in local.postgres_list : name => { engine = "postgres" } }
+  )
+
+  
+
+  shared_settings = {
     instance_class       = "db.t3.micro"
     subnet_ids           = module.prod_vpc.private_subnet_ids
     security_group_ids   = ["sg-xxxxxxxxxxxx"]
@@ -12,19 +20,20 @@ locals {
 
   rds_customs = {
     "payments-db" = {
-      engine         = "mysql"
       instance_class = "db.t3.small"
     },
     "analytics-db" = {
-      instance_class = "db.t3.medium"
       allocated_storage = 100
     }
   }
 
+  rds_list = concat(local.mysql_list, local.postgres_list)
+
   rds_definitions = {
     for name in local.rds_list :
     name => merge(
-      local.default_settings,
+      local.shared_settings,
+      local.engine_map[name],
       lookup(local.rds_customs, name, {}),
       { name = name }
     )
