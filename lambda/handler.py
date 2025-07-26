@@ -24,17 +24,19 @@ def append_to_list_in_hcl(hcl_text, list_name, new_value):
     if not match:
         raise ValueError(f"List '{list_name}' not found in HCL")
 
+    prefix = match.group(1)
     existing_items_str = match.group(2).strip()
+
+    # Parse list items
     items = [item.strip().strip('"') for item in existing_items_str.split(',') if item.strip()]
-    
+
     if new_value in items:
-        return hcl_text  # Already exists, return unchanged
-    
-    items.append(new_value)
-    new_items_str = ', '.join(f'"{item}"' for item in items)
-    new_list_str = f'{match.group(1)}{new_items_str}]'
-    
-    return hcl_text[:match.start()] + new_list_str + hcl_text[match.end():]
+        return hcl_text  # No change needed
+
+    new_items_str = existing_items_str + f', "{new_value}"' if existing_items_str else f'"{new_value}"'
+    new_list_line = f'{prefix}{new_items_str}]'
+
+    return hcl_text[:match.start()] + new_list_line + hcl_text[match.end():]
 
 def lambda_handler(event, context):
     logger.info("Incoming event: %s", json.dumps(event))
