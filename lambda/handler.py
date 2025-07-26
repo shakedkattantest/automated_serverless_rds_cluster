@@ -24,11 +24,19 @@ def append_to_list_in_hcl(hcl_text, list_name, new_value):
     if not match:
         raise ValueError(f"List '{list_name}' not found in HCL")
 
-    existing_items_str = match.group(2).strip()
-    items = [item.strip().strip('"') for item in existing_items_str.split(',') if item.strip()]
+    list_start, list_body, list_end = match.groups()
+    items = [item.strip().strip('"') for item in list_body.split(',') if item.strip()]
 
     if new_value in items:
-        return hcl_text
+        return hcl_text  # No change needed
+
+    items.append(new_value)
+
+    # Always add trailing comma
+    new_items_str = ', '.join(f'"{item}"' for item in items) + ', '
+
+    new_list_str = f'{list_start}{new_items_str}{list_end}'
+    return hcl_text[:match.start()] + new_list_str + hcl_text[match.end():]
 
     items.append(new_value)
     new_items_str = ', '.join(f'"{item}"' for item in items)
