@@ -7,7 +7,7 @@ resource "aws_db_instance" "this" {
   name                   = var.db_name
   username               = var.username
   password               = var.password
-  subnet_ids             = var.subnet_ids
+  db_subnet_group_name   = var.db_subnet_group_name
   vpc_security_group_ids = var.security_group_ids
   skip_final_snapshot    = true
   publicly_accessible    = false
