@@ -20,6 +20,8 @@ repo = gh.get_repo(GITHUB_REPO)
 def lambda_handler(event, context):
     logger.info("Incoming event: %s", json.dumps(event))
 
+    logger.info("Raw SQS Body: %s", event["Records"][0]["body"])
+
     try:
         raw_body = json.loads(event["Records"][0]["body"])  # SQS body
         sns_message = json.loads(raw_body["Message"])       # SNS message payload
