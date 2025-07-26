@@ -4,7 +4,7 @@ locals {
   default_settings = {
     engine               = "postgres"
     instance_class       = "db.t3.micro"
-    subnet_ids           = ["subnet-xxxxxxxx", "subnet-yyyyyyyy"]
+    subnet_ids           = module.prod_vpc.private_subnet_ids
     security_group_ids   = ["sg-xxxxxxxxxxxx"]
     allocated_storage    = 20
     skip_final_snapshot  = true
