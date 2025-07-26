@@ -18,7 +18,6 @@ resource "aws_db_subnet_group" "rds" {
 
   tags = {
     Name = "rds-subnet-group"
-    Environment = module.prod_vpc.name
   }
 }
 
