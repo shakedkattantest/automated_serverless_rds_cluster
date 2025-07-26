@@ -11,8 +11,10 @@ locals {
 
   shared_settings = {
     instance_class       = "db.t3.micro"
-    db_subnet_group_name   = aws_db_subnet_group.rds.name
-    security_group_ids = [aws_security_group.rds.id]
+    username             = "master_user"
+    password             = "master_password"
+    db_subnet_group_name = aws_db_subnet_group.rds.name
+    security_group_ids   = [aws_security_group.rds.id]
     allocated_storage    = 20
     skip_final_snapshot  = true
   }
@@ -47,6 +49,8 @@ module "rds_instances" {
   name                 = each.value.name
   engine               = each.value.engine
   instance_class       = each.value.instance_class
+  username             = each.value.username
+  password             = each.value.password
   db_subnet_group_name = each.value.db_subnet_group_name
   security_group_ids   = each.value.security_group_ids
   allocated_storage    = each.value.allocated_storage
