@@ -95,9 +95,6 @@ Resources:
                 requestParameters:
                   integration.request.querystring.Action: "'Publish'"
                   integration.request.querystring.TopicArn: "'arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic'"
-                requestTemplates:
-                  application/json: |
-                    Action=Publish&TopicArn=arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic&Message=$util.urlEncode($input.body)
                 responses:
                   default:
                     statusCode: "200"
