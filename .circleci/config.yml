@@ -42,10 +42,7 @@ jobs:
           command: |
             echo "🟢 STEP IS RUNNING"
             git fetch origin main
-            echo "🔍 git show:"
             git show --name-only --pretty=
-            echo "📁 Try extract TARGET_PATH:"
-            git show --name-only --pretty="" | grep '^terraform/env/' | head -n1 | sed -E 's|(terraform/env/[^/]+).*|\1|'
             
 workflows:
   deploy-and-provision:
