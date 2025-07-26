@@ -29,7 +29,7 @@ def lambda_handler(event, context):
         engine = raw_body["engine"]
     except (KeyError, json.JSONDecodeError) as e:
         logger.error("❌ Bad payload: %s", str(e))
-    return {"statusCode": 400, "body": "Invalid request"}
+        return {"statusCode": 400, "body": "Invalid request"}
 
 
 
