@@ -8,12 +8,11 @@ locals {
     { for name in local.postgres_list : name => { engine = "postgres" } }
   )
 
-  
 
   shared_settings = {
     instance_class       = "db.t3.micro"
     db_subnet_group_name   = aws_db_subnet_group.rds.name
-    security_group_ids   = ["sg-xxxxxxxxxxxx"]
+    security_group_ids = [aws_security_group.rds.id]
     allocated_storage    = 20
     skip_final_snapshot  = true
   }
