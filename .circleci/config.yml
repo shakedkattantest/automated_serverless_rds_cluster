@@ -35,16 +35,12 @@ jobs:
   apply-terraform:
     executor:
       name: terraform/default
+      tag: "1.5.7"
     steps:
       - checkout
       - run:
           name: Terraform Apply to Merged Path
           command: |
-            curl -LO https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip
-            unzip terraform_1.5.7_linux_amd64.zip
-            sudo mv terraform /usr/local/bin/
-            git fetch origin main --depth=100 || true
-
             echo "🔁 Recent commits:"
             git log --oneline -n 3 || true
 
