@@ -23,14 +23,14 @@ def lambda_handler(event, context):
     logger.info("Raw SQS Body: %s", event["Records"][0]["body"])
 
     try:
-        raw_body = json.loads(event["Records"][0]["body"])  # SQS body
-        sns_message = json.loads(raw_body["Message"])       # SNS message payload
-        db_name = sns_message["db_name"]
-        engine = sns_message["engine"]
-        env = sns_message["env"]
+        raw_body = json.loads(event["Records"][0]["body"])  # SQS body (already your original JSON)
+        db_name = raw_body["db_name"]
+        env = raw_body["env"]
+        engine = raw_body["engine"]
     except (KeyError, json.JSONDecodeError) as e:
         logger.error("❌ Bad payload: %s", str(e))
     return {"statusCode": 400, "body": "Invalid request"}
+
 
 
     branch_name = f"test-rds-pr-{db_name}-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
