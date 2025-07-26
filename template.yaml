@@ -82,7 +82,9 @@ Resources:
                 - application/json
               produces:
                 - application/json
-              responses: {}
+              responses:
+                "200":
+                  description: OK
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -90,7 +92,7 @@ Resources:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:sns:action/Publish
                 credentials:
                   Fn::GetAtt: ApiGatewayToSNSRole.Arn
-               requestTemplates:
+                requestTemplates:
                   application/json: |
                     Action=Publish&TopicArn=arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic&Message=$util.urlEncode($input.body)
                 responses:
