@@ -34,7 +34,7 @@ def lambda_handler(event, context):
 
 
     branch_name = f"test-rds-pr-{db_name}-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
-    tf_path = f"terraform/env/{env}/rds/main.tf"
+    tf_path = f"terraform/env/{env}/main.tf"
 
     try:
         base = repo.get_branch(BRANCH_BASE)
