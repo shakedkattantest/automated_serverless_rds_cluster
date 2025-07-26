@@ -40,7 +40,7 @@ jobs:
       - run:
           name: Terraform Apply to Merged Path
           command: |
-            TARGET_PATH=$(dirname $(git show --name-only --pretty="" | grep '^terraform/env/' | head -n1))
+            TARGET_PATH=$(git show --name-only --pretty="" | grep '^terraform/env/' | head -n1 | xargs dirname)
             terraform init -input=false $TARGET_PATH
             terraform validate $TARGET_PATH
             terraform plan -input=false -out=tfplan $TARGET_PATH
