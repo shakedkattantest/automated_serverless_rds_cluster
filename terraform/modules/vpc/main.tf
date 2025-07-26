@@ -8,6 +8,7 @@ resource "aws_vpc" "main" {
   }
 }
 
+
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 
@@ -15,6 +16,7 @@ resource "aws_internet_gateway" "igw" {
     Name = "${var.name}-igw"
   }
 }
+
 
 resource "aws_subnet" "public" {
   vpc_id            = aws_vpc.main.id
@@ -27,15 +29,19 @@ resource "aws_subnet" "public" {
   }
 }
 
+
 resource "aws_subnet" "private" {
+  for_each = { for idx, az in var.private_subnet_azs : az => var.private_subnet_cidrs[idx] }
+
   vpc_id            = aws_vpc.main.id
-  cidr_block        = var.private_subnet_cidr
-  availability_zone = var.private_subnet_az
+  cidr_block        = each.value
+  availability_zone = each.key
 
   tags = {
-    Name = "${var.name}-private-subnet"
+    Name = "${var.name}-private-subnet-${each.key}"
   }
 }
+
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
@@ -49,6 +55,7 @@ resource "aws_route_table" "public" {
     Name = "${var.name}-public-rt"
   }
 }
+
 
 resource "aws_route_table_association" "public" {
   subnet_id      = aws_subnet.public.id
