@@ -10,3 +10,13 @@ module "prod_vpc" {
   private_subnet_cidrs  = ["10.0.2.0/24", "10.0.3.0/24"]
   private_subnet_azs    = ["eu-central-1a", "eu-central-1b"]
 }
+
+resource "aws_db_subnet_group" "rds" {
+  name       = "rds-subnet-group"
+  subnet_ids = module.prod_vpc.private_subnet_ids
+
+  tags = {
+    Name = "rds-subnet-group"
+    Environment = module.prod_vpc.name
+  }
+}
