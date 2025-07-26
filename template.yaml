@@ -92,7 +92,7 @@ Resources:
                   Fn::GetAtt: ApiGatewayToSNSRole.Arn
                 requestTemplates:
                   application/json: |
-                    Action=Publish&TopicArn=arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic&Message=$util.urlEncode($input.body)
+                    Action=Publish&TopicArn=arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic&Message="$input.body"
                 responses:
                   default:
                     statusCode: "200"
