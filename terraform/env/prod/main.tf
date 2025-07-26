@@ -27,8 +27,8 @@ locals {
     }
   }
 
-  rds_list = concat(local.mysql_list, local.postgres_list)
 
+  rds_list = concat(local.mysql_list, local.postgres_list)
   rds_definitions = {
     for name in local.rds_list :
     name => merge(
