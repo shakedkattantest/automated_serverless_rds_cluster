@@ -10,12 +10,6 @@ variable "engine" {
 }
 
 
-variable "engine_version" {
-  description = "Engine version"
-  type        = string
-}
-
-
 variable "instance_class" {
   description = "Instance class (e.g., db.t3.micro)"
   type        = string
@@ -25,12 +19,6 @@ variable "instance_class" {
 variable "allocated_storage" {
   description = "Storage size in GB"
   type        = number
-}
-
-
-variable "db_name" {
-  description = "Initial database name"
-  type        = string
 }
 
 
@@ -49,12 +37,6 @@ variable "password" {
 
 variable "db_subnet_group_name" {
   description = "Name of the DB subnet group to associate with the RDS instance"
-  type        = string
-}
-
-
-variable "vpc_id" {
-  description = "VPC ID to associate security group with"
   type        = string
 }
 
