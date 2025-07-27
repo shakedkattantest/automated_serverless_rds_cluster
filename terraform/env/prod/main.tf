@@ -1,6 +1,6 @@
 locals {
   mysql_list    = []
-  postgres_list = ["payments", "analytics", "my7473435596db", ]
+  postgres_list = ["payments", "analytics", ]
 
   # Map DB name
   engine_map = merge(
