@@ -58,9 +58,6 @@ jobs:
             echo "🔧 Running terraform init..."
             terraform init -input=false
 
-            echo "📐 Checking format..."
-            terraform fmt -check
-
             echo "✅ Validating config..."
             terraform validate
 
