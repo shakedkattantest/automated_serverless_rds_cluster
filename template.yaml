@@ -215,7 +215,7 @@ Resources:
 # -----------------------------
 # SECTION: Outputs 
 # -----------------------------
-  Outputs:
+Outputs:
   RDSApiKeyValue:
     Description: API Key for accessing the RDS Provisioning endpoint
     Value: !Ref RDSApiKey
