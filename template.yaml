@@ -8,23 +8,23 @@ Resources:
 # SECTION: Hosted Zone & Cert
 # -----------------------------
 
-RDSHostedZone:
-  Type: AWS::Route53::HostedZone
-  Properties:
-    Name: rds-api.shakedkattan.com
+  RDSHostedZone:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: rds-api.shakedkattan.com
 
-RDSCertificate:
-  Type: AWS::CertificateManager::Certificate
-  Properties:
-    DomainName: rds-api.shakedkattan.com
-    ValidationMethod: DNS
-    DomainValidationOptions:
-      - DomainName: rds-api.shakedkattan.com
-        HostedZoneId: !Ref RDSHostedZone
-    KeyAlgorithm: RSA_2048
-    Tags:
-      - Key: Project
-        Value: ServerlessRDS
+  RDSCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: rds-api.shakedkattan.com
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: rds-api.shakedkattan.com
+          HostedZoneId: !Ref RDSHostedZone
+      KeyAlgorithm: RSA_2048
+      Tags:
+        - Key: Project
+          Value: ServerlessRDS
     
 # -----------------------------
 # SECTION: API Gateway (with Domain + Mapping)
@@ -34,6 +34,7 @@ RDSCertificate:
     Properties:
       Name: RDSRequestAPI
       StageName: prod
+      ApiKeySourceType: HEADER
       EndpointConfiguration: REGIONAL
       Domain:
         DomainName: rds-api.shakedkattan.com
@@ -51,6 +52,7 @@ RDSCertificate:
         paths:
           /request:
             post:
+              x-amazon-apigateway-api-key-required: true
               consumes:
                 - application/json
               produces:
@@ -91,7 +93,27 @@ RDSCertificate:
               - Effect: Allow
                 Action: sns:Publish
                 Resource: !Ref SNSTopic
+  RDSApiKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Name: DevAccessKey
+      Enabled: true
+      StageKeys:
+        - RestApiId: !Ref ApiGateway
+          StageName: prod
 
+  RDSUsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    Properties:
+      UsagePlanName: BasicUsagePlan
+      ApiStages:
+        - ApiId: !Ref ApiGateway
+          Stage: prod
+      Throttle:
+        RateLimit: 1
+        BurstLimit: 1
+      Description: Basic usage control
+      ApiKey: !Ref RDSApiKey
 
 # -----------------------------
 # SECTION: SNS and SQS
@@ -158,3 +180,12 @@ RDSCertificate:
           SQS_QUEUE_URL: !Ref SQSQueue
           SNS_TOPIC_ARN: !Ref SNSTopic
           GITHUB_TOKEN: !Sub '{{resolve:secretsmanager:github-access-token:SecretString:token}}'
+# -----------------------------
+# SECTION: Outputs 
+# -----------------------------
+  Outputs:
+  RDSApiKeyValue:
+    Description: API Key for accessing the RDS Provisioning endpoint
+    Value: !Ref RDSApiKey
+    Export:
+      Name: RDSApiKey
