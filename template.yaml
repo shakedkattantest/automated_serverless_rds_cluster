@@ -8,55 +8,55 @@ Resources:
 # SECTION: Hosted Zone & Cert
 # -----------------------------
 
-  RDSHostedZone:
-    Type: AWS::Route53::HostedZone
-    Properties:
-      Name: shakedkattan.com
+#  RDSHostedZone:
+#    Type: AWS::Route53::HostedZone
+#    Properties:
+#      Name: shakedkattan.com
 
-  RDSCertificate:
-    Type: AWS::CertificateManager::Certificate
-    DependsOn: RDSHostedZone
-    Properties:
-      DomainName: rds-api.shakedkattan.com
-      ValidationMethod: DNS
-      DomainValidationOptions:
-        - DomainName: rds-api.shakedkattan.com
-          HostedZoneId: !Ref RDSHostedZone
-      KeyAlgorithm: RSA_2048
-      Tags:
-        - Key: Project
-          Value: ServerlessRDS
+#  RDSCertificate:
+#    Type: AWS::CertificateManager::Certificate
+#    DependsOn: RDSHostedZone
+#    Properties:
+#      DomainName: rds-api.shakedkattan.com
+#      ValidationMethod: DNS
+#      DomainValidationOptions:
+#        - DomainName: rds-api.shakedkattan.com
+#          HostedZoneId: !Ref RDSHostedZone
+#      KeyAlgorithm: RSA_2048
+#      Tags:
+#        - Key: Project
+#          Value: ServerlessRDS
     
 # -----------------------------
 # SECTION: API Gateway (with Domain + Mapping)
 # -----------------------------
   ApiGateway:
     Type: AWS::Serverless::Api
-    DependsOn:
-      - RDSHostedZone
-      - RDSCertificate
+#    DependsOn:
+#      - RDSHostedZone
+#      - RDSCertificate
     Properties:
       Name: RDSRequestAPI
       StageName: provision
-      ApiKeySourceType: HEADER
-      EndpointConfiguration: REGIONAL
-      Auth:
-        DefaultAuthorizer: NONE
-        ApiKeyRequired: true
-        UsagePlan:
-          CreateUsagePlan: PER_API
-          UsagePlanName: RDSUsagePlan
-          Throttle:
-            RateLimit: 1
-            BurstLimit: 1
-      Domain:
-        DomainName: rds-api.shakedkattan.com
-        CertificateArn: !Ref RDSCertificate
-        Route53:
-          HostedZoneId: !Ref RDSHostedZone
-        BasePath:
-          - /
-        SecurityPolicy: TLS_1_2
+#      ApiKeySourceType: HEADER
+#      EndpointConfiguration: REGIONAL
+#      Auth:
+#        DefaultAuthorizer: NONE
+#        ApiKeyRequired: true
+#        UsagePlan:
+#          CreateUsagePlan: PER_API
+#          UsagePlanName: RDSUsagePlan
+#          Throttle:
+#            RateLimit: 1
+#            BurstLimit: 1
+#      Domain:
+#        DomainName: rds-api.shakedkattan.com
+#        CertificateArn: !Ref RDSCertificate
+#        Route53:
+#          HostedZoneId: !Ref RDSHostedZone
+#        BasePath:
+#          - /
+#        SecurityPolicy: TLS_1_2
       DefinitionBody:
         swagger: "2.0"
         info:
@@ -65,7 +65,7 @@ Resources:
         paths:
           /request:
             post:
-              x-amazon-apigateway-api-key-required: true
+#              x-amazon-apigateway-api-key-required: true
               consumes:
                 - application/json
               produces:
