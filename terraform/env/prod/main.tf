@@ -21,10 +21,10 @@ locals {
   rds_customs = {
     #"payments-db" = {
       #instance_class = "db.t3.small"
-    },
+    #},
     #"analytics-db" = {
       #allocated_storage = 21
-    }
+    #}
   }
 
 
