@@ -17,7 +17,7 @@ jobs:
           name: Deploy Serverless Stack with SAM
           no_output_timeout: 30m
           command: |
-            STACK_NAME="rds-automation-stack2"
+            STACK_NAME="rds-automation-stack"
             if aws cloudformation describe-stacks --stack-name "$STACK_NAME" &> /dev/null; then
               echo "Stack already exists. Skipping SAM deployment."
               exit 0
