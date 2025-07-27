@@ -205,6 +205,5 @@ Resources:
 # -----------------------------
 Outputs:
   RDSApiKeyValue:
-  Description: API Key used to authenticate requests to the RDS provisioning endpoint
-    Description: API Key
+    Description: API Key used to authenticate requests to the RDS provisioning endpoint
     Value: !Ref RDSApiKey
