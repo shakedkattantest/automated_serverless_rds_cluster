@@ -37,6 +37,7 @@ Resources:
       ApiKeySourceType: HEADER
       EndpointConfiguration: REGIONAL
       Auth:
+        DefaultAuthorizer: NONE
         ApiKeyRequired: true
         UsagePlan:
           CreateUsagePlan: PER_API
@@ -204,5 +205,6 @@ Resources:
 # -----------------------------
 Outputs:
   RDSApiKeyValue:
+  Description: API Key used to authenticate requests to the RDS provisioning endpoint
     Description: API Key
-    Value: !Sub '{{resolve:ssm:/aws/reference/api-gateway/api-keys/RDSRequestAPI}}'
+    Value: !Ref RDSApiKey
