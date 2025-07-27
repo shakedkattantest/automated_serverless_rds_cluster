@@ -53,16 +53,36 @@ jobs:
             fi
 
             echo "📁 TARGET_PATH=$TARGET_PATH"
-
             cd "$TARGET_PATH"
+
+            echo "🔧 Running terraform init..."
             terraform init -input=false
-            terraform plan -input=false
-            terraform apply
+
+            echo "📐 Checking format..."
+            terraform fmt -check
+
+            echo "✅ Validating config..."
+            terraform validate
+
+            echo "📝 Planning changes..."
+            terraform plan -input=false -out=tfplan
+
+            echo "🔎 Plan output:"
+            terraform show tfplan
+
+            echo "🚀 Applying changes..."
+            terraform apply -input=false -auto-approve tfplan
             
 workflows:
   deploy-and-provision:
     jobs:
+      - deploy-serverless:
+          filters:
+            branches:
+              only: main
       - apply-terraform:
+          requires:
+            - deploy-serverless
           filters:
             branches:
               only: main
