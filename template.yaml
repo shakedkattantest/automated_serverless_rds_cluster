@@ -11,7 +11,7 @@ Resources:
   RDSHostedZone:
     Type: AWS::Route53::HostedZone
     Properties:
-      Name: rds-api.shakedkattan.com
+      Name: shakedkattan.com
 
   RDSCertificate:
     Type: AWS::CertificateManager::Certificate
