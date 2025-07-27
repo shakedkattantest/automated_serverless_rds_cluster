@@ -1,5 +1,5 @@
 resource "aws_db_instance" "this" {
-  identifier             = "${lower(var.name)}-db"
+  identifier             = "${var.name}-db"
   allocated_storage      = var.allocated_storage
   engine                 = var.engine
   instance_class         = var.instance_class
