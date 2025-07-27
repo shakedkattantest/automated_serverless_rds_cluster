@@ -70,16 +70,16 @@ jobs:
             echo "Applying changes..."
             terraform apply -input=false -auto-approve tfplan
             
-workflows:
-  deploy-and-provision:
-    jobs:
-      - deploy-serverless:
-          filters:
-            branches:
-              only: main
-      - apply-terraform:
-          requires:
-            - deploy-serverless
-          filters:
-            branches:
-              only: main
+#workflows:
+  #deploy-and-provision:
+    #jobs:
+      #- deploy-serverless:
+          #filters:
+            #branches:
+              #only: main
+      #- apply-terraform:
+          #requires:
+            #- deploy-serverless
+          #filters:
+            #branches:
+              #only: main
