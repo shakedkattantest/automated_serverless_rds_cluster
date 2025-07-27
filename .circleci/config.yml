@@ -18,7 +18,7 @@ jobs:
           command: |
             STACK_NAME="rds-automation-stack"
             if aws cloudformation describe-stacks --stack-name "$STACK_NAME" &> /dev/null; then
-              echo "✅ Stack already exists. Skipping SAM deployment."
+              echo "Stack already exists. Skipping SAM deployment."
               exit 0
             else
               #echo "🚀 Stack not found. Deploying with SAM..."
@@ -41,33 +41,33 @@ jobs:
       - run:
           name: Terraform Apply to Merged Path
           command: |
-            echo "🔁 Recent commits:"
+            echo "Recent commits:"
             git log --oneline -n 3 || true
 
-            echo "🔍 Detecting changed env:"
+            echo "Detecting changed env:"
             TARGET_PATH=$(git diff --name-only HEAD^ HEAD | grep '^terraform/env/' | head -n1 | sed -E 's|(terraform/env/[^/]+).*|\1|')
 
             if [ -z "$TARGET_PATH" ]; then
-              echo "❌ No env path found. Skipping Terraform apply."
+              echo "No env path found. Skipping Terraform apply."
               exit 0
             fi
 
-            echo "📁 TARGET_PATH=$TARGET_PATH"
+            echo "TARGET_PATH=$TARGET_PATH"
             cd "$TARGET_PATH"
 
-            echo "🔧 Running terraform init..."
+            echo "Running terraform init..."
             terraform init -input=false
 
-            echo "✅ Validating config..."
+            echo "Validating config..."
             terraform validate
 
-            echo "📝 Planning changes..."
+            echo "Planning changes..."
             terraform plan -input=false -out=tfplan
 
-            echo "🔎 Plan output:"
+            echo "Plan output:"
             terraform show tfplan
 
-            echo "🚀 Applying changes..."
+            echo "Applying changes..."
             terraform apply -input=false -auto-approve tfplan
             
 workflows:
