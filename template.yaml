@@ -57,9 +57,11 @@ Resources:
                 - application/json
               produces:
                 - application/json
-              responses:
-                "200":
-                  description: OK
+              parameters:
+                - in: body
+                  name: body
+                  schema:
+                    $ref: "#/definitions/RDSRequest"
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -73,6 +75,27 @@ Resources:
                 responses:
                   default:
                     statusCode: "200"
+                    responseTemplates:
+                      application/json: |
+                        {
+                          "message": "Request received successfully."
+                        }
+        definitions:
+          RDSRequest:
+            type: object
+            required:
+              - db_name
+              - env
+              - engine
+            properties:
+              db_name:
+                type: string
+              env:
+                type: string
+                enum: [dev, prod]
+              engine:
+                type: string
+                enum: [mysql, postgres]
 
   ApiGatewayToSNSRole:
     Type: AWS::IAM::Role
@@ -135,6 +158,15 @@ Resources:
       Endpoint: !GetAtt SQSQueue.Arn
       TopicArn: !Ref SNSTopic
       RawMessageDelivery: true
+      DeliveryPolicy:
+        healthyRetryPolicy:
+          numRetries: 5
+          minDelayTarget: 5
+          maxDelayTarget: 10
+          numNoDelayRetries: 1
+          numMinDelayRetries: 2
+          numMaxDelayRetries: 2
+          backoffFunction: "linear"      
 
   QueuePolicy:
     Type: AWS::SQS::QueuePolicy
