@@ -33,9 +33,17 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Name: RDSRequestAPI
-      StageName: prod
+      StageName: provision
       ApiKeySourceType: HEADER
       EndpointConfiguration: REGIONAL
+      Auth:
+        ApiKeyRequired: true
+        UsagePlan:
+          CreateUsagePlan: PER_API
+          UsagePlanName: RDSUsagePlan
+          Throttle:
+            RateLimit: 1
+            BurstLimit: 1
       Domain:
         DomainName: rds-api.shakedkattan.com
         CertificateArn: !Ref RDSCertificate
@@ -116,27 +124,6 @@ Resources:
               - Effect: Allow
                 Action: sns:Publish
                 Resource: !Ref SNSTopic
-  RDSApiKey:
-    Type: AWS::ApiGateway::ApiKey
-    Properties:
-      Name: DevAccessKey
-      Enabled: true
-      StageKeys:
-        - RestApiId: !Ref ApiGateway
-          StageName: prod
-
-  RDSUsagePlan:
-    Type: AWS::ApiGateway::UsagePlan
-    Properties:
-      UsagePlanName: BasicUsagePlan
-      ApiStages:
-        - ApiId: !Ref ApiGateway
-          Stage: prod
-      Throttle:
-        RateLimit: 1
-        BurstLimit: 1
-      Description: Basic usage control
-      ApiKey: !Ref RDSApiKey
 
 # -----------------------------
 # SECTION: SNS and SQS
@@ -217,7 +204,5 @@ Resources:
 # -----------------------------
 Outputs:
   RDSApiKeyValue:
-    Description: API Key for accessing the RDS Provisioning endpoint
-    Value: !Ref RDSApiKey
-    Export:
-      Name: RDSApiKey
+    Description: API Key
+    Value: !Sub '{{resolve:ssm:/aws/reference/api-gateway/api-keys/RDSRequestAPI}}'
