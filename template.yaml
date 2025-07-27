@@ -15,6 +15,7 @@ Resources:
 
   RDSCertificate:
     Type: AWS::CertificateManager::Certificate
+    DependsOn: RDSHostedZone
     Properties:
       DomainName: rds-api.shakedkattan.com
       ValidationMethod: DNS
@@ -31,6 +32,9 @@ Resources:
 # -----------------------------
   ApiGateway:
     Type: AWS::Serverless::Api
+    DependsOn:
+      - RDSHostedZone
+      - RDSCertificate
     Properties:
       Name: RDSRequestAPI
       StageName: provision
