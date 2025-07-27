@@ -1,6 +1,6 @@
 locals {
   mysql_list    = []
-  postgres_list = ["payments", "analytics", "my74733435596db", ]
+  postgres_list = []
 
   # Map DB name
   engine_map = merge(
@@ -19,11 +19,11 @@ locals {
   }
 
   rds_customs = {
-    "payments-db" = {
-      instance_class = "db.t3.small"
+    #"payments-db" = {
+      #instance_class = "db.t3.small"
     },
-    "analytics-db" = {
-      allocated_storage = 21
+    #"analytics-db" = {
+      #allocated_storage = 21
     }
   }
 
