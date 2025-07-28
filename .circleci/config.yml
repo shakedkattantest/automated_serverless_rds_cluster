@@ -74,13 +74,13 @@ jobs:
 workflows:
   deploy-and-provision:
     jobs:
-      - deploy-serverless:
-          filters:
-            branches:
-              only: main
+      #- deploy-serverless:
+          #filters:
+            #branches:
+              #only: main
       - apply-terraform:
-          requires:
-            - deploy-serverless
+          #requires:
+            #- deploy-serverless
           filters:
             branches:
               only: main
