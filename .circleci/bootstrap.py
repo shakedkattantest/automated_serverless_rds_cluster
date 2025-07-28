@@ -98,8 +98,8 @@ def update_ssm_parameters():
 #  Commit and push local changes to GitHub using GitPython-style interaction
 # =============================================================================
 def commit_to_github():
-    subprocess.run(["git", "config", "user.email", "ci-bot@yourdomain.com"], check=True)
-    subprocess.run(["git", "config", "user.name", "CI Bootstrap Bot"], check=True)
+    subprocess.run(["git", "config", "user.email", "ci-bot@yourdomain.com"])
+    subprocess.run(["git", "config", "user.name", "CI Bootstrap Bot"] )
     subprocess.run(["git", "add", "."], check=True)
     subprocess.run(["git", "commit", "-m", "bootstrap: update tf files with region, modules, and ssm"], check=True)
     subprocess.run(["git", "push", "origin", "main"], check=True)
