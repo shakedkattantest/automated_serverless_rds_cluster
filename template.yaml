@@ -47,7 +47,7 @@ Resources:
                 requestTemplates:
                   application/json: |
                     Action=Publish
-                    &TopicArn=$util.urlEncode('arn:aws:sns:${AWS::Region}:${AWS::AccountId}:RDSProvisioningTopic')
+                    &TopicArn=arn:aws:sns:${AWS::Region}:${AWS::AccountId}:RDSProvisioningTopic
                     &Message=$util.urlEncode($input.body)
                 passthroughBehavior: NEVER
                 responses:
