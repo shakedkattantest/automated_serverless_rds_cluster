@@ -16,16 +16,21 @@ jobs:
       - aws-cli/install
       - sam/install
       - run:
-          name: Deploy Serverless Stack with SAM
+          name: Conditionally Deploy Serverless Stack with SAM
           command: |
-            sam build
-            sam deploy --stack-name rds-automation-stack \
-                       --capabilities CAPABILITY_IAM \
-                       --capabilities CAPABILITY_NAMED_IAM \
-                       --region $AWS_REGION \
-                       --resolve-s3 \
-                       --no-confirm-changeset \
-                       --no-fail-on-empty-changeset
+            if [[ -z "$CIRCLE_PULL_REQUEST" ]]; then
+              echo "No PR detected – running SAM deploy..."
+              sam build
+              sam deploy --stack-name rds-automation-stack \
+                         --capabilities CAPABILITY_IAM \
+                         --capabilities CAPABILITY_NAMED_IAM \
+                         --region $AWS_REGION \
+                         --resolve-s3 \
+                         --no-confirm-changeset \
+                         --no-fail-on-empty-changeset
+            else
+              echo "PR detected – skipping SAM deploy."
+            fi
 
   apply-terraform:
     executor:
@@ -34,38 +39,28 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install GitHub CLI
+          name: Terraform Apply to PR Merged Path
           command: |
-            type gh || (
-              sudo apt-get update -y &&
-              sudo apt-get install -y curl &&
-              curl -fsSL https://cli.github.com/install.sh | sudo bash
-            )
-      - run:
-          name: Terraform Apply to Changed Env
-          command: |
-            echo "🔍 Detecting changed file..."
-            if [ -n "$CIRCLE_PULL_REQUEST" ]; then
-              echo "Detected Pull Request: $CIRCLE_PULL_REQUEST"
+            if [[ -n "$CIRCLE_PULL_REQUEST" ]]; then
+              echo "PR detected – proceeding with Terraform apply..."
               PR_NUMBER=$(echo "$CIRCLE_PULL_REQUEST" | awk -F '/' '{print $NF}')
               CHANGED_FILE=$(gh pr view "$PR_NUMBER" \
                 --repo "$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME" \
                 --json files --jq '.files[0].path')
+              echo "Changed file: $CHANGED_FILE"
+
+              TARGET_PATH=$(echo "$CHANGED_FILE" | sed -E 's|terraform/env/([^/]+).*|\1|')
+              echo "TARGET_PATH=$TARGET_PATH"
+              cd "terraform/env/$TARGET_PATH"
+
+              terraform init -input=false
+              terraform validate
+              terraform plan -input=false -out=tfplan
+              terraform show tfplan
+              terraform apply -input=false -auto-approve tfplan
             else
-              echo "No PR found. Using git show fallback"
-              CHANGED_FILE=$(git show --name-only --pretty="" | grep '^terraform/env/' | head -n1)
+              echo "Not a PR – skipping Terraform apply."
             fi
-
-            echo "📁 CHANGED_FILE=$CHANGED_FILE"
-            TARGET_PATH=$(echo "$CHANGED_FILE" | sed -E 's|(terraform/env/[^/]+).*|\1|')
-            echo "📂 TARGET_PATH=$TARGET_PATH"
-            cd "$TARGET_PATH"
-
-            echo "🚀 Running terraform..."
-            terraform init -input=false
-            terraform validate
-            terraform plan -input=false -out=tfplan
-            terraform apply -input=false -auto-approve tfplan
 
 workflows:
   version: 2
@@ -75,17 +70,7 @@ workflows:
           filters:
             branches:
               only: main
-          unless:
-            condition:
-              matches:
-                pattern: "^Merge pull request"
-                value: << pipeline.git.commit.subject >>
       - apply-terraform:
           filters:
             branches:
               only: main
-          when:
-            condition:
-              matches:
-                pattern: "^Merge pull request"
-                value: << pipeline.git.commit.subject >>
