@@ -12,7 +12,7 @@ module "prod_vpc" {
 }
 
 
-resource "aws_db_subnet_group" "prod-rds" {
+resource "aws_db_subnet_group" "prod_rds" {
   name       = "prod-rds-subnet-group"
   subnet_ids = module.prod_vpc.private_subnet_ids
 
@@ -22,7 +22,7 @@ resource "aws_db_subnet_group" "prod-rds" {
 }
 
 
-resource "aws_security_group" "prod-rds" {
+resource "aws_security_group" "prod_rds" {
   name        = "prod-rds-sg"
   description = "Allow DB traffic"
   vpc_id      = module.prod_vpc.vpc_id
