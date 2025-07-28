@@ -25,10 +25,13 @@ REPO_NAME = "automated_serverless_rds_cluster"
 REPO_PATH = Path("/tmp") / REPO_NAME  # Local path for working with the repo
 
 # =============================================================================
-#  GitHub authentication using personal access token from environment variable & Get Repo
+#  GitHub authentication using personal access token from environment variable
 # =============================================================================
 gh = Github(os.environ["GITHUB_TOKEN"])
 
+# =============================================================================
+#  Access the user's GitHub repo by name (should already exist in the account)
+# =============================================================================
 repo = gh.get_user().get_repo(REPO_NAME)
 
 # =============================================================================
@@ -90,7 +93,7 @@ def update_ssm_parameters():
     )
 
 # =============================================================================
-#  Commit and push local changes to GitHub
+#  Commit and push local changes to GitHub using GitPython-style interaction
 # =============================================================================
 def commit_to_github():
     repo.git.add(all=True)
@@ -107,6 +110,9 @@ def main():
     for env in ["dev", "prod"]:
         update_file(f"terraform/env/{env}/backend.tf", {
             r'region\s*=\s*".*?"': f'region = "{AWS_REGION}"'
+        })
+        update_file(f"terraform/env/{env}/backend.tf", {
+            r'region\s*=\s*".*?"': f'region = "{AWS_REGION}"'  
         })
         update_file(f"terraform/env/{env}/vpc.tf", {
             r'git::https://github.com/.+?/automated_serverless_rds_cluster.git//terraform/modules/vpc\?ref=main':
