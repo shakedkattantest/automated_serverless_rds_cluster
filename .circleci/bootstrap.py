@@ -17,7 +17,7 @@ from pathlib import Path
 AWS_REGION = os.getenv("AWS_REGION", "eu-central-1")  # Default region if not set
 AWS_ACCESS_KEY = os.environ["AWS_ACCESS_KEY_ID"]
 AWS_SECRET_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
-GITHUB_USERNAME = os.environ["GITHUB_USERNAME"]
+GITHUB_USERNAME = os.environ["CIRCLE_PROJECT_USERNAME"]
 DB_USERNAME = os.environ["DB_USERNAME"]
 DB_PASSWORD = os.environ["DB_PASSWORD"]
 
