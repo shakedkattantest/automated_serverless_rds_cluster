@@ -46,7 +46,7 @@ locals {
       local.shared_settings,
       local.engine_map[name],
       lookup(local.rds_customs, name, {}),
-      { name = "prod-${name}" }
+      { name = "dev-${name}" }
     )
   }
 }
