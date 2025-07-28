@@ -30,6 +30,11 @@ Resources:
 # -----------------------------
 # SECTION: API Gateway (with Domain + Mapping)
 # -----------------------------
+  ApiGwLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/apigateway/rds-api
+      RetentionInDays: 7
   ApiGateway:
     Type: AWS::Serverless::Api
 #    DependsOn:
@@ -38,6 +43,23 @@ Resources:
     Properties:
       Name: RDSRequestAPI
       StageName: provision
+      AccessLogSetting:
+        DestinationArn: !GetAtt ApiGwLogGroup.Arn
+        Format: |
+          {
+            "requestId": "$context.requestId",
+            "ip": "$context.identity.sourceIp",
+            "requestTime": "$context.requestTime",
+            "httpMethod": "$context.httpMethod",
+            "routeKey": "$context.routeKey",
+            "status": "$context.status",
+            "responseLatency": "$context.responseLatency"
+          }
+      MethodSettings:
+        - LoggingLevel: INFO
+          MetricsEnabled: true
+          ResourcePath: "/*"
+          HttpMethod: "*"
 #      ApiKeySourceType: HEADER
 #      EndpointConfiguration: REGIONAL
 #      Auth:
