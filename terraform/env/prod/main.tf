@@ -40,7 +40,7 @@ locals {
   }
 }
 
-module "prod_rds_instances" {
+module "rds_instances" {
   for_each = local.rds_definitions
 
   source = "git::https://github.com/shakedkattan/automated_serverless_rds_cluster.git//terraform/modules/rds?ref=main"
