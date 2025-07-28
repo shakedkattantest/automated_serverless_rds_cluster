@@ -43,13 +43,8 @@ Resources:
                 credentials:
                   Fn::GetAtt: ApiGatewayToSNSRole.Arn
                 requestParameters:
-                  integration.request.header.Content-Type: "'application/x-www-form-urlencoded'"
-                requestTemplates:
-                  application/json: |
-                    Action=Publish
-                    &TopicArn=arn:aws:sns:${AWS::Region}:${AWS::AccountId}:RDSProvisioningTopic
-                    &Message=$util.urlEncode($input.body)
-                passthroughBehavior: NEVER
+                  integration.request.querystring.TopicArn: "'arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic'"
+                  integration.request.querystring.Message: "method.request.body"
                 responses:
                   default:
                     statusCode: "200"
