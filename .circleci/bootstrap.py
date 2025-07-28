@@ -39,19 +39,27 @@ def update_file(file_path, replacements):
 #  Create S3 bucket with versioning and best practices for Terraform backend
 # =============================================================================
 def create_tf_bucket():
+    print(f"📦 Creating S3 bucket in region: {AWS_REGION}")
+    bucket_name = f"{GITHUB_USERNAME}-devops-tfstate-bucket"
+
     s3 = boto3.client("s3", region_name=AWS_REGION,
                       aws_access_key_id=AWS_ACCESS_KEY,
                       aws_secret_access_key=AWS_SECRET_KEY)
-    bucket_name = f"{GITHUB_USERNAME}-devops-tfstate-bucket"
 
-    s3.create_bucket(
-        Bucket=bucket_name,
-        CreateBucketConfiguration={"LocationConstraint": AWS_REGION}
-    )
+    # us-east-1 requires no LocationConstraint
+    if AWS_REGION == "us-east-1":
+        s3.create_bucket(Bucket=bucket_name)
+    else:
+        s3.create_bucket(
+            Bucket=bucket_name,
+            CreateBucketConfiguration={"LocationConstraint": AWS_REGION}
+        )
+
     s3.put_bucket_versioning(
         Bucket=bucket_name,
         VersioningConfiguration={"Status": "Enabled"}
     )
+
     s3.put_public_access_block(
         Bucket=bucket_name,
         PublicAccessBlockConfiguration={
@@ -61,6 +69,8 @@ def create_tf_bucket():
             "RestrictPublicBuckets": True,
         },
     )
+
+    print(f" Bucket '{bucket_name}' created and secured.")
     return bucket_name
 
 # =============================================================================
