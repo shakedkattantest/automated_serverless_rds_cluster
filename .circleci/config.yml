@@ -101,7 +101,13 @@ workflows:
   version: 2
   serverless-rds-provision:
     jobs:
+      - bootstrap:
+          filters:
+            branches:
+              only: main
       - deploy-serverless:
+          requires:
+            - bootstrap
           filters:
             branches:
               only: main
