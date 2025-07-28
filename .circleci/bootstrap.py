@@ -103,6 +103,10 @@ def commit_to_github():
     subprocess.run(["git", "add", "."], check=True)
     subprocess.run(["git", "commit", "-m", "bootstrap: update tf files with region, modules, and ssm"], check=True)
     subprocess.run(["git", "push", "origin", "main"], check=True)
+    result = subprocess.run(["git", "diff", "--cached", "--quiet"])
+    if result.returncode == 0:
+        print(" No changes to commit.")
+        return
     
 # =============================================================================
 #  Main orchestration logic — create bucket, store credentials, update TF files
