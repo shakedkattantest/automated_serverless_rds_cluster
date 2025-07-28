@@ -35,7 +35,7 @@ def create_github_token_secret():
 
     secret_name = "github-access-token"
     secret_value = {
-        "token": os.environ["CIRCLECI_API_TOKEN"]
+        "token": os.environ["GITHUB_PERSONAL_TOKEN"]
     }
 
     try:
