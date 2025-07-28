@@ -18,6 +18,7 @@ resource "aws_db_instance" "main" {
 resource "aws_db_instance" "read_replica" {
   identifier           = "${var.name}-replica-db"
   replicate_source_db  = aws_db_instance.main.id
+  depends_on          = [aws_db_instance.main]
   instance_class       = var.instance_class  
   publicly_accessible  = false
   skip_final_snapshot  = true
