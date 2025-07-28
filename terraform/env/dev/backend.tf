@@ -10,12 +10,12 @@ terraform {
   backend "s3" {
     bucket         = "shakedkattan-devops-tfstate-bucket"
     key            = "env/dev/terraform.tfstate"
-    region         = "eu-central-1"
+    region = "us-east-1"
     dynamodb_table = "terraform-locks"
     encrypt        = true
   }
 }
 
 provider "aws" {
-  region = "eu-central-1"
+  region = "us-east-1"
 }
