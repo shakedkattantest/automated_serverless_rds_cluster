@@ -56,7 +56,7 @@ Resources:
             #"responseLatency": "$context.responseLatency"
           #}
       MethodSettings:
-        - LoggingLevel: OFF
+        - LoggingLevel: "OFF"
           MetricsEnabled: true
           ResourcePath: "/*"
           HttpMethod: "*"
