@@ -3,38 +3,11 @@ Transform: AWS::Serverless-2016-10-31
 Description: Serverless stack for provisioning RDS (Postgres/MySQL) clusters
 
 Resources:
-
 # -----------------------------
-# SECTION: Hosted Zone & Cert
-# -----------------------------
-
-#  RDSHostedZone:
-#    Type: AWS::Route53::HostedZone
-#    Properties:
-#      Name: shakedkattan.com
-
-#  RDSCertificate:
-#    Type: AWS::CertificateManager::Certificate
-#    DependsOn: RDSHostedZone
-#    Properties:
-#      DomainName: rds-api.shakedkattan.com
-#      ValidationMethod: DNS
-#      DomainValidationOptions:
-#        - DomainName: rds-api.shakedkattan.com
-#          HostedZoneId: !Ref RDSHostedZone
-#      KeyAlgorithm: RSA_2048
-#      Tags:
-#        - Key: Project
-#          Value: ServerlessRDS
-    
-# -----------------------------
-# SECTION: API Gateway (with Domain + Mapping)
+# SECTION: API Gateway
 # -----------------------------
   ApiGateway:
     Type: AWS::Serverless::Api
-#    DependsOn:
-#      - RDSHostedZone
-#      - RDSCertificate
     Properties:
       Name: RDSRequestAPI
       StageName: provision
@@ -63,7 +36,6 @@ Resources:
         paths:
           /request:
             post:
-
               consumes:
                 - application/json
               produces:
@@ -83,7 +55,7 @@ Resources:
                 credentials:
                   Fn::GetAtt: ApiGatewayToSNSRole.Arn
                 requestParameters:
-                  integration.request.querystring.TopicArn: "'arn:aws:sns:eu-central-1:851725584737:RDSProvisioningTopic'"
+                  integration.request.querystring.TopicArn: !Sub "'${SNSTopicArn}'"
                   integration.request.querystring.Message: "method.request.body"
                 responses:
                   default:
@@ -160,6 +132,7 @@ Resources:
                 Action: sns:Publish
                 Resource: !Ref SNSTopic
 
+
 # -----------------------------
 # SECTION: SNS and SQS
 # -----------------------------
@@ -232,6 +205,8 @@ Resources:
             Condition:
               ArnEquals:
                 aws:SourceArn: !Ref SNSTopic
+
+                
 # -----------------------------
 # SECTION: Lambda for RDS Provision 
 # -----------------------------
@@ -263,6 +238,8 @@ Resources:
           SQS_QUEUE_URL: !Ref SQSQueue
           SNS_TOPIC_ARN: !Ref SNSTopic
           GITHUB_TOKEN: !Sub '{{resolve:secretsmanager:github-access-token:SecretString:token}}'
+
+          
 # -----------------------------
 # SECTION: Application Insights
 # -----------------------------
@@ -287,6 +264,8 @@ Resources:
             - Ref: AWS::StackName
       AutoConfigurationEnabled: 'true'
     DependsOn: ApplicationResourceGroup
+
+    
 # -----------------------------
 # SECTION: Outputs 
 # -----------------------------
