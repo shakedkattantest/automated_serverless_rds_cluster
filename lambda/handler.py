@@ -1,3 +1,10 @@
+# ================================================================================
+#     Entry point for the Lambda function triggered by SQS messages.
+#     Parses the incoming event, extracts RDS parameters (db_name, env, engine),
+#     and triggers a GitHub PR creation to provision a new RDS cluster.
+# ================================================================================
+
+# Imports
 import os
 import json
 import boto3
@@ -7,7 +14,7 @@ from datetime import datetime
 import re
 
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.ERROR)
 
 # ENV Vars
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
@@ -18,6 +25,12 @@ BRANCH_BASE = os.environ.get("BRANCH_BASE", "main")
 gh = Github(GITHUB_TOKEN)
 repo = gh.get_repo(GITHUB_REPO)
 
+
+# ================================================================================
+#     This function receives HCL text as a string, locates a specific list 
+#     (e.g., mysql_list = [ ... ]), and appends a new value to that list 
+#     without duplicating existing entries. Basically creating a new RDS Cluster
+# ================================================================================
 def append_to_list_in_hcl(hcl_text, list_name, new_value):
     pattern = rf'({list_name}\s*=\s*\[)([^\]]*)(\])'
     match = re.search(pattern, hcl_text)
@@ -28,7 +41,7 @@ def append_to_list_in_hcl(hcl_text, list_name, new_value):
     items = [item.strip().strip('"') for item in list_body.split(',') if item.strip()]
 
     if new_value in items:
-        return hcl_text  # No change needed
+        return hcl_text  
 
     items.append(new_value)
 
@@ -44,10 +57,22 @@ def append_to_list_in_hcl(hcl_text, list_name, new_value):
 
     return hcl_text[:match.start()] + new_list_str + hcl_text[match.end():]
 
+
+# ================================================================================
+#     This function receives HCL text as a string, locates a specific list 
+#     (e.g., mysql_list = [ ... ]), and appends a new value to that list 
+#     without duplicating existing entries. Basically creating a new RDS Cluster
+# ================================================================================
 def lambda_handler(event, context):
     logger.info("Incoming event: %s", json.dumps(event))
     logger.info("Raw SQS Body: %s", event["Records"][0]["body"])
 
+# ================================================================================
+#     Extracts and validates the incoming JSON payload from SQS message body.
+#     Ensures required keys (db_name, env, engine) are present.
+#     Returns HTTP 400 if the payload is malformed or missing fields.
+# ================================================================================
+    
     try:
         raw_body = json.loads(event["Records"][0]["body"])  # SQS body
         db_name = raw_body["db_name"]
@@ -61,6 +86,12 @@ def lambda_handler(event, context):
     tf_path = f"terraform/env/{env}/main.tf"
     list_name = "mysql_list" if engine == "mysql" else "postgres_list"
 
+# ================================================================================
+#     Creates a new Git branch based on the default branch (e.g., "main").
+#     Retrieves the existing Terraform file corresponding to the environment.
+#     Determines which list (MySQL/Postgres) to append the new DB name to.
+# ================================================================================
+    
     try:
         base = repo.get_branch(BRANCH_BASE)
         repo.create_git_ref(ref=f"refs/heads/{branch_name}", sha=base.commit.sha)
@@ -68,6 +99,12 @@ def lambda_handler(event, context):
         file = repo.get_contents(tf_path, ref=BRANCH_BASE)
         existing = file.decoded_content.decode()
 
+# ================================================================================
+#     Calls helper function to inject the new DB name into the appropriate
+#     list (mysql_list / postgres_list) inside the Terraform file.
+#     Ensures no duplicate entries. Keeps formatting and adds trailing comma.
+# ================================================================================
+        
         new_content = append_to_list_in_hcl(existing, list_name=list_name, new_value=db_name)
 
         repo.update_file(
@@ -78,13 +115,21 @@ def lambda_handler(event, context):
             branch=branch_name
         )
 
+# ================================================================================
+#     Updates the Terraform file in the new branch and commits the changes.
+#     Then creates a Pull Request (PR) from the new branch to main.
+#     The PR contains a title and body describing the provisioned DB.
+# ================================================================================   
+        
         pr = repo.create_pull(
             title=f"Provision {db_name}",
             body=f"Automated PR to add `{db_name}` to `{list_name}`.",
             head=branch_name,
             base=BRANCH_BASE
         )
-
+        
+# ================================================================================  
+        
         logger.info("✅ PR URL: %s", pr.html_url)
         return {"statusCode": 200, "body": f"PR created: {pr.html_url}"}
 
