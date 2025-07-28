@@ -51,12 +51,17 @@ Resources:
                 type: aws
                 httpMethod: POST
                 uri:
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:sns:action/Publish
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:sns:path//
                 credentials:
                   Fn::GetAtt: ApiGatewayToSNSRole.Arn
                 requestParameters:
-                  integration.request.querystring.TopicArn: !GetAtt SNSTopic.TopicArn
-                  integration.request.querystring.Message: "method.request.body"
+                  integration.request.header.Content-Type: "'application/x-www-form-urlencoded'"
+                requestTemplates:
+                  application/json: |
+                    Action=Publish
+                    &TopicArn=$util.urlEncode('arn:aws:sns:${AWS::Region}:${AWS::AccountId}:RDSProvisioningTopic')
+                    &Message=$util.urlEncode($input.body)
+                passthroughBehavior: NEVER
                 responses:
                   default:
                     statusCode: "200"
@@ -65,6 +70,7 @@ Resources:
                         {
                           "message": "Request received successfully."
                         }
+
         definitions:
           RDSRequest:
             type: object
