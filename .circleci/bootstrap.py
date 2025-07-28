@@ -95,82 +95,6 @@ def update_ssm_parameters():
     )
     
 # =============================================================================
-# Retrieves the current AWS account ID from STS to construct full ARNs dynamically
-# =============================================================================
-def get_account_id():
-    sts = boto3.client("sts",
-                       aws_access_key_id=AWS_ACCESS_KEY,
-                       aws_secret_access_key=AWS_SECRET_KEY)
-    return sts.get_caller_identity()["Account"]
-    
-# =============================================================================
-# Retrieves the current AWS account ID from STS to construct full ARNs dynamically
-# =============================================================================
-def set_apigw_logging_role():
-    print(" Creating and assigning CloudWatch Logs role for API Gateway...")
-
-    iam = boto3.client("iam", region_name=AWS_REGION,
-                       aws_access_key_id=AWS_ACCESS_KEY,
-                       aws_secret_access_key=AWS_SECRET_KEY)
-    
-    apigw = boto3.client("apigateway", region_name=AWS_REGION,
-                         aws_access_key_id=AWS_ACCESS_KEY,
-                         aws_secret_access_key=AWS_SECRET_KEY)
-
-    account_id = get_account_id()
-    role_name = "ApiGwCloudWatchLogsRole"
-    role_arn = f"arn:aws:iam::{account_id}:role/{role_name}"
-
-    # Create the role if it doesn't exist
-    try:
-        iam.get_role(RoleName=role_name)
-        print(f" IAM role '{role_name}' already exists.")
-    except iam.exceptions.NoSuchEntityException:
-        print(f" Creating IAM role '{role_name}'...")
-        iam.create_role(
-            RoleName=role_name,
-            AssumeRolePolicyDocument=json.dumps({
-                "Version": "2012-10-17",
-                "Statement": [{
-                    "Effect": "Allow",
-                    "Principal": {"Service": "apigateway.amazonaws.com"},
-                    "Action": "sts:AssumeRole"
-                }]
-            })
-        )
-
-        iam.put_role_policy(
-            RoleName=role_name,
-            PolicyName="AllowApiGatewayCloudWatch",
-            PolicyDocument=json.dumps({
-                "Version": "2012-10-17",
-                "Statement": [{
-                    "Effect": "Allow",
-                    "Action": [
-                        "logs:CreateLogGroup",
-                        "logs:CreateLogStream",
-                        "logs:PutLogEvents"
-                    ],
-                    "Resource": "*"
-                }]
-            })
-        )
-        print(f" IAM role '{role_name}' created and configured.")
-
-    # Assign the role to API Gateway account settings
-    apigw.update_account(
-        patchOperations=[
-            {
-                "op": "replace",
-                "path": "/cloudwatchRoleArn",
-                "value": role_arn
-            }
-        ]
-    )
-
-    print(f" API Gateway logging role assigned: {role_arn}")
-
-# =============================================================================
 #  Commit and push local changes to GitHub using GitPython-style interaction
 # =============================================================================
 def commit_to_github():
@@ -186,7 +110,6 @@ def commit_to_github():
 def main():
     create_tf_bucket()
     update_ssm_parameters()
-    set_apigw_logging_role()
     
     for env in ["dev", "prod"]:
         update_file(f"terraform/env/{env}/backend.tf", {
