@@ -264,3 +264,11 @@ Resources:
             - Ref: AWS::StackName
       AutoConfigurationEnabled: 'true'
     DependsOn: ApplicationResourceGroup
+
+# ================================================================================
+# SECTION: Outputs
+# ================================================================================
+Outputs:
+  ApiInvokeUrl:
+    Description: Invoke URL for the POST /request endpoint
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/provision/request"
