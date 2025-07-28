@@ -45,6 +45,7 @@ jobs:
                 echo "Regular push – running SAM deploy..."
                 sam build
                 sam deploy --stack-name rds-automation-stack \
+                            --capabilities CAPABILITY_IAM \
                            --capabilities CAPABILITY_NAMED_IAM \
                            --region $AWS_REGION \
                            --resolve-s3 \
