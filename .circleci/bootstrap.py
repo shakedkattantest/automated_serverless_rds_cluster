@@ -42,10 +42,14 @@ def create_tf_bucket():
                       aws_secret_access_key=AWS_SECRET_KEY)
     bucket_name = f"{GITHUB_USERNAME}-devops-tfstate-bucket"
 
-    s3.create_bucket(
-        Bucket=bucket_name,
-        CreateBucketConfiguration={"LocationConstraint": AWS_REGION}
-    )
+    if AWS_REGION == "us-east-1":
+        s3.create_bucket(Bucket=bucket_name)
+    else:
+        s3.create_bucket(
+            Bucket=bucket_name,
+            CreateBucketConfiguration={"LocationConstraint": AWS_REGION}
+        )
+
     s3.put_bucket_versioning(
         Bucket=bucket_name,
         VersioningConfiguration={"Status": "Enabled"}
@@ -60,7 +64,6 @@ def create_tf_bucket():
         },
     )
     return bucket_name
-
 # =============================================================================
 #  Store DB username and password as SecureString in AWS SSM Parameter Store
 # =============================================================================
