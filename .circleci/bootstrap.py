@@ -26,34 +26,6 @@ REPO_NAME = "automated_serverless_rds_cluster"
 REPO_PATH = Path.cwd()  # Local path for working with the repo
 
 # =============================================================================
-# Store GitHub Personal Access Token in AWS Secrets Manager for Lambda access
-# =============================================================================
-def create_github_token_secret():
-    secretsmanager = boto3.client("secretsmanager", region_name=AWS_REGION,
-                                  aws_access_key_id=AWS_ACCESS_KEY,
-                                  aws_secret_access_key=AWS_SECRET_KEY)
-
-    secret_name = "github-access-token"
-    secret_value = {
-        "token": os.environ["DOCS_GITHUB_TOKEN"]
-    }
-
-    try:
-        secretsmanager.create_secret(
-            Name=secret_name,
-            SecretString=json.dumps(secret_value),
-            Description="GitHub access token for Lambda to create PRs"
-        )
-        print(f" Secret '{secret_name}' created successfully.")
-    except secretsmanager.exceptions.ResourceExistsException:
-        print(f" Secret '{secret_name}' already exists. Updating it...")
-        secretsmanager.update_secret(
-            SecretId=secret_name,
-            SecretString=json.dumps(secret_value)
-        )
-        print(f" Secret '{secret_name}' updated successfully.")
-
-# =============================================================================
 #  Update file contents based on regex replacements (used for region/source URLs)
 # =============================================================================
 def update_file(file_path, replacements):
@@ -143,7 +115,6 @@ def commit_to_github():
 def main():
     create_tf_bucket()
     update_ssm_parameters()
-    create_github_token_secret()
     
     for env in ["dev", "prod"]:
         update_file(f"terraform/env/{env}/backend.tf", {
