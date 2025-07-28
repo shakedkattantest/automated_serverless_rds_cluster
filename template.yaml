@@ -38,7 +38,6 @@ Resources:
     Properties:
       Name: RDSRequestAPI
       StageName: provision
-      CloudWatchRoleArn: !GetAtt ApiGwCloudWatchLogsRole.Arn
       AccessLogSetting:
         DestinationArn: !GetAtt ApiGwLogGroup.Arn
         Format: |
@@ -52,29 +51,10 @@ Resources:
             "responseLatency": "$context.responseLatency"
           }
       MethodSettings:
-        - LoggingLevel: "OFF"
+        - LoggingLevel: "INFO"
           MetricsEnabled: true
           ResourcePath: "/*"
           HttpMethod: "*"
-#      ApiKeySourceType: HEADER
-#      EndpointConfiguration: REGIONAL
-#      Auth:
-#        DefaultAuthorizer: NONE
-#        ApiKeyRequired: true
-#        UsagePlan:
-#          CreateUsagePlan: PER_API
-#          UsagePlanName: RDSUsagePlan
-#          Throttle:
-#            RateLimit: 1
-#            BurstLimit: 1
-#      Domain:
-#        DomainName: rds-api.shakedkattan.com
-#        CertificateArn: !Ref RDSCertificate
-#        Route53:
-#          HostedZoneId: !Ref RDSHostedZone
-#        BasePath:
-#          - /
-#        SecurityPolicy: TLS_1_2
       DefinitionBody:
         swagger: "2.0"
         info:
@@ -83,7 +63,7 @@ Resources:
         paths:
           /request:
             post:
-#              x-amazon-apigateway-api-key-required: true
+
               consumes:
                 - application/json
               produces:
