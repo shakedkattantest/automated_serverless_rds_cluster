@@ -1,7 +1,8 @@
 import boto3
 import os
 import re
-import subprocess
+import base64
+from github import Github
 from pathlib import Path
 
 # ================================================================================
@@ -16,12 +17,22 @@ from pathlib import Path
 AWS_REGION = os.getenv("AWS_REGION", "eu-central-1")  # Default region if not set
 AWS_ACCESS_KEY = os.environ["AWS_ACCESS_KEY_ID"]
 AWS_SECRET_KEY = os.environ["AWS_SECRET_ACCESS_KEY"]
-GITHUB_USERNAME = os.environ["CIRCLE_PROJECT_USERNAME"]
+GITHUB_USERNAME = os.environ["GITHUB_USERNAME"]
 DB_USERNAME = os.environ["DB_USERNAME"]
 DB_PASSWORD = os.environ["DB_PASSWORD"]
 
 REPO_NAME = "automated_serverless_rds_cluster"
 REPO_PATH = Path.cwd()  # Local path for working with the repo
+
+# =============================================================================
+#  GitHub authentication using personal access token from environment variable
+# =============================================================================
+gh = Github(os.environ["GITHUB_TOKEN"])
+
+# =============================================================================
+#  Access the user's GitHub repo by name (should already exist in the account)
+# =============================================================================
+repo = gh.get_user().get_repo(REPO_NAME)
 
 # =============================================================================
 #  Update file contents based on regex replacements (used for region/source URLs)
@@ -42,14 +53,10 @@ def create_tf_bucket():
                       aws_secret_access_key=AWS_SECRET_KEY)
     bucket_name = f"{GITHUB_USERNAME}-devops-tfstate-bucket"
 
-    if AWS_REGION == "us-east-1":
-        s3.create_bucket(Bucket=bucket_name)
-    else:
-        s3.create_bucket(
-            Bucket=bucket_name,
-            CreateBucketConfiguration={"LocationConstraint": AWS_REGION}
-        )
-
+    s3.create_bucket(
+        Bucket=bucket_name,
+        CreateBucketConfiguration={"LocationConstraint": AWS_REGION}
+    )
     s3.put_bucket_versioning(
         Bucket=bucket_name,
         VersioningConfiguration={"Status": "Enabled"}
@@ -64,6 +71,7 @@ def create_tf_bucket():
         },
     )
     return bucket_name
+
 # =============================================================================
 #  Store DB username and password as SecureString in AWS SSM Parameter Store
 # =============================================================================
@@ -85,13 +93,12 @@ def update_ssm_parameters():
     )
 
 # =============================================================================
-#  Commit and push local changes to GitHub using git CLI
+#  Commit and push local changes to GitHub using GitPython-style interaction
 # =============================================================================
 def commit_to_github():
-    os.chdir(REPO_PATH)
-    subprocess.run(["git", "add", "."], check=True)
-    subprocess.run(["git", "commit", "-m", "bootstrap: update tf files with region, modules, and ssm"], check=True)
-    subprocess.run(["git", "push"], check=True)
+    repo.git.add(all=True)
+    repo.git.commit("-m", "bootstrap: update tf files with region, modules, and ssm")
+    repo.git.push()
 
 # =============================================================================
 #  Main orchestration logic — create bucket, store credentials, update TF files
@@ -103,6 +110,9 @@ def main():
     for env in ["dev", "prod"]:
         update_file(f"terraform/env/{env}/backend.tf", {
             r'region\s*=\s*".*?"': f'region = "{AWS_REGION}"'
+        })
+        update_file(f"terraform/env/{env}/backend.tf", {
+            r'region\s*=\s*".*?"': f'region = "{AWS_REGION}"'  
         })
         update_file(f"terraform/env/{env}/vpc.tf", {
             r'git::https://github.com/.+?/automated_serverless_rds_cluster.git//terraform/modules/vpc\?ref=main':
