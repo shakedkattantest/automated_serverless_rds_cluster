@@ -92,6 +92,37 @@ def update_ssm_parameters():
         Type="SecureString",
         Overwrite=True,
     )
+    
+# =============================================================================
+# Retrieves the current AWS account ID from STS to construct full ARNs dynamically
+# =============================================================================
+def get_account_id():
+    sts = boto3.client("sts",
+                       aws_access_key_id=AWS_ACCESS_KEY,
+                       aws_secret_access_key=AWS_SECRET_KEY)
+    return sts.get_caller_identity()["Account"]
+    
+# =============================================================================
+# Retrieves the current AWS account ID from STS to construct full ARNs dynamically
+# =============================================================================
+def set_apigw_logging_role():
+    print(" Setting CloudWatch Logs role for API Gateway account settings...")
+    apigw = boto3.client("apigateway", region_name=AWS_REGION,
+                         aws_access_key_id=AWS_ACCESS_KEY,
+                         aws_secret_access_key=AWS_SECRET_KEY)
+    
+    role_arn = f"arn:aws:iam::{get_account_id()}:role/ApiGwCloudWatchLogsRole"
+    
+    apigw.update_account(
+        patchOperations=[
+            {
+                "op": "replace",
+                "path": "/cloudwatchRoleArn",
+                "value": role_arn
+            }
+        ]
+    )
+    print(f" API Gateway logging role set to: {role_arn}")
 
 # =============================================================================
 #  Commit and push local changes to GitHub using GitPython-style interaction
@@ -109,7 +140,8 @@ def commit_to_github():
 def main():
     create_tf_bucket()
     update_ssm_parameters()
-
+    set_apigw_logging_role()
+    
     for env in ["dev", "prod"]:
         update_file(f"terraform/env/{env}/backend.tf", {
             r'region\s*=\s*".*?"': f'region = "{AWS_REGION}"'
