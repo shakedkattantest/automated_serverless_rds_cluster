@@ -24,10 +24,6 @@ DB_PASSWORD = os.environ["DB_PASSWORD"]
 REPO_NAME = "automated_serverless_rds_cluster"
 REPO_PATH = Path("/tmp") / REPO_NAME  # Local path for working with the repo
 
-# =============================================================================
-#  GitHub authentication using personal access token from environment variable
-# =============================================================================
-gh = Github(os.environ["GITHUB_TOKEN"])
 
 # =============================================================================
 #  Access the user's GitHub repo by name (should already exist in the account)
