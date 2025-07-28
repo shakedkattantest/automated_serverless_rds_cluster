@@ -1,6 +1,6 @@
 locals {
   mysql_list    = []
-  postgres_list = ["testdb2", ]
+  postgres_list = []
 
   # Map DB name
   engine_map = merge(
@@ -10,7 +10,7 @@ locals {
 
 
   shared_settings = {
-    instance_class       = "db.t3.micro"
+    instance_class       = "db.t4g.micro"
     username             = "master_user"
     password             = "master_password"
     db_subnet_group_name = aws_db_subnet_group.dev_rds.name
