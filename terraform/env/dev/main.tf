@@ -1,11 +1,11 @@
-data "aws_ssm_parameter" "db_username" {
-  name = "/project/db/username"
-}
+#data "aws_ssm_parameter" "db_username" {
+#  name = "/project/db/username"
+#}
 
-data "aws_ssm_parameter" "db_password" {
-  name            = "/project/db/password"
-  with_decryption = true
-}
+#data "aws_ssm_parameter" "db_password" {
+#  name            = "/project/db/password"
+#  with_decryption = true
+#}
 
 locals {
   mysql_list    = []
@@ -20,8 +20,10 @@ locals {
 
   shared_settings = {
     instance_class       = "db.t4g.micro"
-    db_username = data.aws_ssm_parameter.db_username.value
-    db_password = data.aws_ssm_parameter.db_password.value
+    #db_username = data.aws_ssm_parameter.db_username.value
+    #db_password = data.aws_ssm_parameter.db_password.value
+    username             = "masteruser"
+    password             = "masterpw"
     db_subnet_group_name = aws_db_subnet_group.dev_rds.name
     security_group_ids   = [aws_security_group.dev_rds.id]
     allocated_storage    = 20
