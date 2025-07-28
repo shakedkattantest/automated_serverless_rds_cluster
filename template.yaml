@@ -12,7 +12,7 @@ Resources:
       Name: RDSRequestAPI
       StageName: provision
       MethodSettings:
-        - LoggingLevel: "INFO"
+        - LoggingLevel: "OFF"
           MetricsEnabled: true
           ResourcePath: "/*"
           HttpMethod: "*"
