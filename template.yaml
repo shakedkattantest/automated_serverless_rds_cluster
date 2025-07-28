@@ -39,7 +39,7 @@ Resources:
                 type: aws
                 httpMethod: POST
                 uri:
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:sns:path//
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:sns:action/Publish
                 credentials:
                   Fn::GetAtt: ApiGatewayToSNSRole.Arn
                 requestParameters:
