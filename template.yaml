@@ -41,7 +41,7 @@ Resources:
                 credentials:
                   Fn::GetAtt: ApiGatewayToSNSRole.Arn
                 requestParameters:
-                  integration.request.querystring.TopicArn: "'arn:aws:sns:${AWS::Region}:851725584737:RDSProvisioningTopic'"
+                  integration.request.querystring.TopicArn: !Sub "'${SNSTopicArn}'"
                   integration.request.querystring.Message: "method.request.body"
                 responses:
                   default:
