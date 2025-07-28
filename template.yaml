@@ -241,6 +241,8 @@ Resources:
       FunctionName: RDSProvisionerFunction
       Handler: handler.lambda_handler
       Runtime: python3.12
+      Architectures:
+          - arm64
       CodeUri: lambda/
       Events:
         SQSTrigger:
