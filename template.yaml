@@ -30,11 +30,6 @@ Resources:
 # -----------------------------
 # SECTION: API Gateway (with Domain + Mapping)
 # -----------------------------
-  ApiGwLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: /aws/apigateway/rds-api
-      RetentionInDays: 7
   ApiGateway:
     Type: AWS::Serverless::Api
 #    DependsOn:
@@ -43,18 +38,19 @@ Resources:
     Properties:
       Name: RDSRequestAPI
       StageName: provision
-      #AccessLogSetting:
-        #DestinationArn: !GetAtt ApiGwLogGroup.Arn
-        #Format: |
-          #{
-            #"requestId": "$context.requestId",
-            #"ip": "$context.identity.sourceIp",
-            #"requestTime": "$context.requestTime",
-            #"httpMethod": "$context.httpMethod",
-            #"routeKey": "$context.routeKey",
-            #"status": "$context.status",
-            #"responseLatency": "$context.responseLatency"
-          #}
+      CloudWatchRoleArn: !GetAtt ApiGwCloudWatchLogsRole.Arn
+      AccessLogSetting:
+        DestinationArn: !GetAtt ApiGwLogGroup.Arn
+        Format: |
+          {
+            "requestId": "$context.requestId",
+            "ip": "$context.identity.sourceIp",
+            "requestTime": "$context.requestTime",
+            "httpMethod": "$context.httpMethod",
+            "routeKey": "$context.routeKey",
+            "status": "$context.status",
+            "responseLatency": "$context.responseLatency"
+          }
       MethodSettings:
         - LoggingLevel: "OFF"
           MetricsEnabled: true
@@ -131,6 +127,36 @@ Resources:
               engine:
                 type: string
                 enum: [mysql, postgres]
+
+  ApiGwLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/apigateway/rds-api
+      RetentionInDays: 7
+
+  ApiGwCloudWatchLogsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ApiGwCloudWatchLogsRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AllowApiGatewayCloudWatch
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+
 
   ApiGatewayToSNSRole:
     Type: AWS::IAM::Role
