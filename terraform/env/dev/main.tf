@@ -1,6 +1,6 @@
 locals {
   mysql_list    = []
-  postgres_list = ["testdb2", ]
+  postgres_list = []
 
   # Map DB name
   engine_map = merge(
@@ -40,7 +40,7 @@ locals {
   }
 }
 
-module "rds_instances" {
+module "dev_rds_instances" {
   for_each = local.rds_definitions
 
   source = "git::https://github.com/shakedkattan/automated_serverless_rds_cluster.git//terraform/modules/rds?ref=main"
