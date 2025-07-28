@@ -2,7 +2,7 @@ import boto3
 import os
 import re
 import base64
-from github import Github
+import subprocess
 from pathlib import Path
 
 # ================================================================================
@@ -24,15 +24,6 @@ DB_PASSWORD = os.environ["DB_PASSWORD"]
 REPO_NAME = "automated_serverless_rds_cluster"
 REPO_PATH = Path.cwd()  # Local path for working with the repo
 
-# =============================================================================
-#  GitHub authentication using personal access token from environment variable
-# =============================================================================
-gh = Github(os.environ["GITHUB_TOKEN"])
-
-# =============================================================================
-#  Access the user's GitHub repo by name (should already exist in the account)
-# =============================================================================
-repo = gh.get_user().get_repo(REPO_NAME)
 
 # =============================================================================
 #  Update file contents based on regex replacements (used for region/source URLs)
@@ -96,10 +87,12 @@ def update_ssm_parameters():
 #  Commit and push local changes to GitHub using GitPython-style interaction
 # =============================================================================
 def commit_to_github():
-    repo.git.add(all=True)
-    repo.git.commit("-m", "bootstrap: update tf files with region, modules, and ssm")
-    repo.git.push()
-
+    subprocess.run(["git", "config", "user.email", "ci-bot@yourdomain.com"], check=True)
+    subprocess.run(["git", "config", "user.name", "CI Bootstrap Bot"], check=True)
+    subprocess.run(["git", "add", "."], check=True)
+    subprocess.run(["git", "commit", "-m", "bootstrap: update tf files with region, modules, and ssm"], check=True)
+    subprocess.run(["git", "push", "origin", "main"], check=True)
+    
 # =============================================================================
 #  Main orchestration logic — create bucket, store credentials, update TF files
 # =============================================================================
