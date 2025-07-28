@@ -102,7 +102,6 @@ def commit_to_github():
     subprocess.run(["git", "config", "user.name", "CI Bootstrap Bot"], check=True)
     subprocess.run(["git", "add", "."], check=True)
 
-    # בדיקה אם יש שינויים לקומיט
     result = subprocess.run(["git", "diff", "--cached", "--quiet"])
     if result.returncode == 0:
         print(" No changes to commit.")
