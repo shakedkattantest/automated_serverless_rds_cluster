@@ -264,12 +264,3 @@ Resources:
             - Ref: AWS::StackName
       AutoConfigurationEnabled: 'true'
     DependsOn: ApplicationResourceGroup
-
-    
-# -----------------------------
-# SECTION: Outputs 
-# -----------------------------
-#Outputs:
-  #RDSApiKeyValue:
-    #Description: API Key used to authenticate requests to the RDS provisioning endpoint
-    #Value: !Ref ApiGatewayApiKeyDefault
