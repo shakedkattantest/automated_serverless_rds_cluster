@@ -115,12 +115,12 @@ def main():
         update_file(f"terraform/env/{env}/backend.tf", {
             r'region\s*=\s*".*?"': f'region = "{AWS_REGION}"'
         })
-        update_file(f"terraform/env/{env}/backend.tf", {
-            r'region\s*=\s*".*?"': f'region = "{AWS_REGION}"'  
-        })
         update_file(f"terraform/env/{env}/vpc.tf", {
             r'git::https://github.com/.+?/automated_serverless_rds_cluster.git//terraform/modules/vpc\?ref=main':
-            f'git::https://github.com/{GITHUB_USERNAME}/automated_serverless_rds_cluster.git//terraform/modules/vpc?ref=main'
+            f'git::https://github.com/{GITHUB_USERNAME}/automated_serverless_rds_cluster.git//terraform/modules/vpc?ref=main',
+            r'public_subnet_az\s*=\s*".*?"': f'public_subnet_az = "{AWS_REGION}a"',
+            r'private_subnet_azs\s*=\s*\[.*?\]': f'private_subnet_azs = ["{AWS_REGION}a", "{AWS_REGION}b"]',
+            r'private_subnet_cidrs\s*=\s*\[.*?\]': 'private_subnet_cidrs = ["10.0.2.0/24", "10.0.3.0/24"]',
         })
         update_file(f"terraform/env/{env}/main.tf", {
             r'git::https://github.com/.+?/automated_serverless_rds_cluster.git//terraform/modules/rds\?ref=main':
