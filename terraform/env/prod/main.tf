@@ -9,7 +9,7 @@
 
 locals {
   mysql_list    = []
-  postgres_list = ["mydb123", ]
+  postgres_list = []
 
   # Map DB name
   engine_map = merge(
@@ -20,10 +20,10 @@ locals {
 
   shared_settings = {
     instance_class       = "db.t3.micro"
-    #db_username = data.aws_ssm_parameter.db_username.value
-    db_username = "masteruser"
-    #db_password = data.aws_ssm_parameter.db_password.value
-    db_password = "masterpw"
+    #username = data.aws_ssm_parameter.db_username.value
+    username = "masteruser"
+    #password = data.aws_ssm_parameter.db_password.value
+    password = "masterpw"
     db_subnet_group_name = aws_db_subnet_group.prod_rds.name
     security_group_ids   = [aws_security_group.prod_rds.id]
     allocated_storage    = 20
