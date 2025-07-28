@@ -33,8 +33,6 @@ Resources:
                   name: body
                   schema:
                     $ref: "#/definitions/RDSRequest"
-              x-amazon-apigateway-auth:
-                  type: aws_iam
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
