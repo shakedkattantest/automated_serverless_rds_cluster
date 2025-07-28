@@ -13,8 +13,8 @@ locals {
     instance_class       = "db.t3.micro"
     username             = "master_user"
     password             = "master_password"
-    db_subnet_group_name = aws_db_subnet_group.rds.name
-    security_group_ids   = [aws_security_group.rds.id]
+    db_subnet_group_name = aws_db_subnet_group.prod_rds.name
+    security_group_ids   = [aws_security_group.prod_rds.id]
     allocated_storage    = 20
   }
 
