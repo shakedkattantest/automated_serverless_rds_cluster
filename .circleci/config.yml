@@ -13,13 +13,14 @@ jobs:
       - image: cimg/python:3.12
     steps:
       - checkout
+      - aws-cli/install
       - run:
-          name: Install dependencies
+          name: Install Python Dependencies
           command: pip install boto3 PyGithub
       - run:
-          name: Run bootstrap.py if SAM stack not deployed
+          name: Run bootstrap script if SAM stack not deployed
           command: |
-            if aws cloudformation describe-stacks --stack-name rds-automation-stack --region $AWS_REGION > /dev/null 2>&1; then
+            if aws cloudformation describe-stacks --stack-name rds-automation-stack --region "$AWS_REGION" > /dev/null 2>&1; then
               echo "SAM stack already exists – skipping bootstrap."
             else
               echo "SAM stack not found – running bootstrap..."
