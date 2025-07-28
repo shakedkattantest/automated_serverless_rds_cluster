@@ -188,9 +188,9 @@ Resources:
     Properties:
       QueueName: RDSProvisioningQueue
       VisibilityTimeout: 60
-        RedrivePolicy:
-          deadLetterTargetArn: !GetAtt RDSDLQ.Arn
-          maxReceiveCount: 5
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt RDSDLQ.Arn
+        maxReceiveCount: 5
 
   SQSSubscription:
     Type: AWS::SNS::Subscription
