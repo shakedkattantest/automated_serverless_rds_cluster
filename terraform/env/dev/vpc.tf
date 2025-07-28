@@ -1,4 +1,4 @@
-module "prod_vpc" {
+module "dev_vpc" {
   source = "git::https://github.com/shakedkattan/automated_serverless_rds_cluster.git///terraform/modules/vpc?ref=main"
 
   name                 = "dev"
