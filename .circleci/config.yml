@@ -15,7 +15,6 @@ jobs:
       - sam/install
       - run:
           name: Deploy Serverless Stack with SAM
-          no_output_timeout: 30m
           command: |
             STACK_NAME="rds-automation-stack"
               sam build
@@ -26,38 +25,6 @@ jobs:
                          --resolve-s3 \
                          --no-confirm-changeset \
                          --no-fail-on-empty-changeset
-            fi
-      - run:
-          name: Create Terraform State Infra if Needed
-          command: |
-            BUCKET_NAME="shakedkattan-tfstate-bucket"
-            TABLE_NAME="terraform-locks"
-            REGION="$AWS_REGION"
-
-            if ! aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
-              echo "⛏ Creating S3 bucket: $BUCKET_NAME"
-              aws s3api create-bucket --bucket "$BUCKET_NAME" --region "$REGION" \
-                --create-bucket-configuration LocationConstraint="$REGION"
-              aws s3api put-bucket-versioning --bucket "$BUCKET_NAME" \
-                --versioning-configuration Status=Enabled
-              aws s3api put-bucket-encryption --bucket "$BUCKET_NAME" \
-                --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
-            else
-              echo "✅ S3 bucket already exists: $BUCKET_NAME"
-            fi
-
-            if ! aws dynamodb describe-table --table-name "$TABLE_NAME" --region "$REGION" >/dev/null 2>&1; then
-              echo "⛏ Creating DynamoDB table: $TABLE_NAME"
-              aws dynamodb create-table \
-                --table-name "$TABLE_NAME" \
-                --attribute-definitions AttributeName=LockID,AttributeType=S \
-                --key-schema AttributeName=LockID,KeyType=HASH \
-                --billing-mode PAYPERREQUEST \
-                --region "$REGION"
-            else
-              echo "✅ DynamoDB table already exists: $TABLE_NAME"
-            fi
-  
 
   apply-terraform:
     executor:
