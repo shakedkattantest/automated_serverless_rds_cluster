@@ -1,11 +1,11 @@
-#data "aws_ssm_parameter" "db_username" {
-#  name = "/project/db/username"
-#}
+data "aws_ssm_parameter" "db_username" {
+  name = "/project/db/username"
+}
 
-#data "aws_ssm_parameter" "db_password" {
-#  name = "/project/db/password"
-#  with_decryption = true
-#}
+data "aws_ssm_parameter" "db_password" {
+  name = "/project/db/password"
+  with_decryption = true
+}
 
 locals {
   mysql_list    = []
@@ -20,22 +20,20 @@ locals {
 
   shared_settings = {
     instance_class       = "db.t3.micro"
-    #username = data.aws_ssm_parameter.db_username.value
-    username = "masteruser"
-    #password = data.aws_ssm_parameter.db_password.value
-    password = "masterpw"
+    username = data.aws_ssm_parameter.db_username.value
+    password = data.aws_ssm_parameter.db_password.value
     db_subnet_group_name = aws_db_subnet_group.prod_rds.name
     security_group_ids   = [aws_security_group.prod_rds.id]
     allocated_storage    = 20
   }
 
   rds_customs = {
-    #"payments-db" = {
-      #instance_class = "db.t3.small"
-    #},
-    #"analytics-db" = {
-      #allocated_storage = 21
-    #}
+#    "payments-db" = {         (USE LIKE SO)
+#      instance_class = "db.t3.small"
+#    },
+#    "analytics-db" = {
+#      allocated_storage = 21
+#    }
   }
 
 
