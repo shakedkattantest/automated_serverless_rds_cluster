@@ -8,14 +8,14 @@ terraform {
     }
   }
   backend "s3" {
-    bucket         = "shakedkattan-devops-tfstate-bucket"
+    bucket = "shakedkattantest-devops-tfstate-bucket"
     key            = "env/prod/terraform.tfstate"
-    region = "usa-east-1"
+    region = "us-east-1"
     dynamodb_table = "terraform-locks"
     encrypt        = true
   }
 }
 
 provider "aws" {
-  region = "uas-east-1"
+  region = "us-east-1"
 }

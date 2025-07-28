@@ -8,7 +8,7 @@ terraform {
     }
   }
   backend "s3" {
-    bucket         = "shakedkattanos-devops-tfstate-bucket"
+    bucket = "shakedkattantest-devops-tfstate-bucket"
     key            = "env/dev/terraform.tfstate"
     region = "us-east-1"
     dynamodb_table = "terraform-locks"
@@ -17,5 +17,5 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-eassst-1"
+  region = "us-east-1"
 }
