@@ -43,18 +43,18 @@ Resources:
     Properties:
       Name: RDSRequestAPI
       StageName: provision
-      AccessLogSetting:
-        DestinationArn: !GetAtt ApiGwLogGroup.Arn
-        Format: |
-          {
-            "requestId": "$context.requestId",
-            "ip": "$context.identity.sourceIp",
-            "requestTime": "$context.requestTime",
-            "httpMethod": "$context.httpMethod",
-            "routeKey": "$context.routeKey",
-            "status": "$context.status",
-            "responseLatency": "$context.responseLatency"
-          }
+      #AccessLogSetting:
+        #DestinationArn: !GetAtt ApiGwLogGroup.Arn
+        #Format: |
+          #{
+            #"requestId": "$context.requestId",
+            #"ip": "$context.identity.sourceIp",
+            #"requestTime": "$context.requestTime",
+            #"httpMethod": "$context.httpMethod",
+            #"routeKey": "$context.routeKey",
+            #"status": "$context.status",
+            #"responseLatency": "$context.responseLatency"
+          #}
       MethodSettings:
         - LoggingLevel: INFO
           MetricsEnabled: true
