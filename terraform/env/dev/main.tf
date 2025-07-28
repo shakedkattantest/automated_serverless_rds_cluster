@@ -13,8 +13,8 @@ locals {
     instance_class       = "db.t3.micro"
     username             = "master_user"
     password             = "master_password"
-    db_subnet_group_name = aws_db_subnet_group.rds.name
-    security_group_ids   = [aws_security_group.rds.id]
+    db_subnet_group_name = aws_db_subnet_group.dev_rds.name
+    security_group_ids   = [aws_security_group.dev_rds.id]
     allocated_storage    = 20
   }
 
@@ -40,7 +40,7 @@ locals {
   }
 }
 
-module "rds_instances" {
+module "dev_rds_instances" {
   for_each = local.rds_definitions
 
   source = "git::https://github.com/shakedkattan/automated_serverless_rds_cluster.git//terraform/modules/rds?ref=main"
