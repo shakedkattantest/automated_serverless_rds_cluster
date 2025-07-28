@@ -21,7 +21,7 @@ DB_USERNAME = os.environ["DB_USERNAME"]
 DB_PASSWORD = os.environ["DB_PASSWORD"]
 
 REPO_NAME = "automated_serverless_rds_cluster"
-REPO_PATH = Path("/tmp") / REPO_NAME  # Local path for working with the repo
+REPO_PATH = Path.cwd()  # Local path for working with the repo
 
 # =============================================================================
 #  Update file contents based on regex replacements (used for region/source URLs)
