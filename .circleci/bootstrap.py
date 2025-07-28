@@ -113,7 +113,8 @@ def main():
     
     for env in ["dev", "prod"]:
         update_file(f"terraform/env/{env}/backend.tf", {
-            r'region\s*=\s*".*?"': f'region = "{AWS_REGION}"'
+    r'region\s*=\s*".*?"': f'region = "{AWS_REGION}"',
+    r'bucket\s*=\s*".*?"': f'bucket = "{GITHUB_USERNAME}-devops-tfstate-bucket"'
         })
         update_file(f"terraform/env/{env}/vpc.tf", {
             r'git::https://github.com/.+?/automated_serverless_rds_cluster.git//terraform/modules/vpc\?ref=main':
