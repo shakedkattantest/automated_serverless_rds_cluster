@@ -52,7 +52,7 @@ locals {
 module "prod_rds_instances" {
   for_each = local.rds_definitions
 
-  source = "git::https://github.com/shakedkattantest/automated_serverless_rds_cluster.git//terraform/modules/rds?ref=main"
+  source = "git::https://github.com/shakedkattanst/automated_serverless_rds_cluster.git//terraform/modules/rds?ref=main"
 
   name                 = each.value.name
   engine               = each.value.engine
