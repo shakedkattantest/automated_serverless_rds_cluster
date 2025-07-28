@@ -8,7 +8,6 @@ resource "aws_db_instance" "main" {
   db_subnet_group_name   = var.db_subnet_group_name
   vpc_security_group_ids = var.security_group_ids
   publicly_accessible    = false
-  enabled_cloudwatch_logs_exports = ["error", "slowquery"]
   skip_final_snapshot     = true
 
   tags = {
